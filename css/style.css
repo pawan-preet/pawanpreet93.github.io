@@ -5,36 +5,66 @@
 
 body {
     background: #33323C;
-    color:white;
+}
+
+#mainDiv {
+  position:absolute;
+  color:#fff;
+  top:30%;
+  left:50%;
+  padding:15px;
+  -ms-transform: translateX(-50%) translateY(-50%);
+  -webkit-transform: translate(-50%,-50%);
+  transform: translate(-50%,-50%);
 }
 
 .var-highlight {
-  color: #C0AD60;
+  color: #ed5494;
+}
+
+.let-highlight {
+  color: #ed5494;
 }
 
 .string-highlight {
   color: #ff544a;
 }
 
-.print-highlight {
+.comments-highlight {
+  color: #9afc95;
+}
+
+.function-highlight {
   color: #01b6af;
+}
+
+.braces {
+    color: white;
+}
+
+.variable-name {
+    color: white;
+}
+
+.enum-name {
+    color: #ffd064;
+}
+
+.enum-value {
+    color: #c7caeb;
 }
 
 #typewriter {
   font-size: 2em;
   margin: 0;
   font-family: defaultFont;
+    color: aqua;
 }
 
 #typewriter:after {
   content: "|";
   -webkit-animation: blink 500ms linear infinite alternate;
           animation: blink 500ms linear infinite alternate;
-}
-
-#mainDiv {
-    margin: 100px;
-    align-content: center;
 }
 
 @-webkit-keyframes blink {
