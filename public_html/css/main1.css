@@ -1,0 +1,619 @@
+body{
+font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+}
+
+.bg-video-container {
+    margin-top: -100px;
+    position: relative;
+    overflow: hidden;
+}
+
+video.bg-video {
+    background: #ffffff;
+    min-width: 100%;
+    width:auto;
+    height: auto;
+    background-size: cover;
+}
+
+.overlay{
+    width:100%;
+    margin-top: 130px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    text-align: left;
+    padding: 80px;
+    color: #ffffff;
+}
+
+.caption{
+    font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
+    font-size: 40px;
+    background-color: #f6f6f6 !important;
+    color: #000000;
+    text-align: center;
+    padding: 10px;
+}
+
+.why{
+    text-align: center;
+    padding: 15px;
+    font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+    font-size: 20px;
+    color: #7f7f7f;
+}
+
+.what{
+    color: #7f7f7f;
+}
+
+.how{
+    overflow: hidden;
+    margin: 10px;
+    padding: 0px;
+}
+
+.section-why{
+    padding-top: 150px;
+    padding-bottom: 150px;
+}
+
+.section-how{
+    background-color: #f2f2f2;
+    padding: 150px 70px;
+}
+
+.brand-name{
+    font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
+    font-size: 42px;
+    color: #00b050 !important;
+    text-shadow: 2px 2px #fffe96;
+    font-weight: bold;
+}
+
+img.navbar-brand{
+    width:75px;
+    height:75px;
+    margin-left:50px;
+    margin-top:-18px; 
+}
+
+.nav-opt-lg{
+    font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
+    font-size: 24px;
+    color: #00b050 !important;
+    font-weight: bold;
+}
+
+.nav-opt-sm{
+    font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+#map-canvas {
+    width: 100%;
+    height: 480px;
+    background-color: #CCC;
+}
+
+.section-heading{
+    padding: 30px 10px 10px 10px;
+    text-align: center;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.animate{
+    position: absolute;
+    padding: 10px;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    
+    font-size: 18px;
+    background-color: #000000;
+    color: #B5E361;
+    opacity: .75;
+    
+    left : 0px;
+    top : -100%;
+}
+
+
+.animate p {
+font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+}
+
+#site_visit, #design, #installation, #maintenance, #permits, #marketing {
+    position: relative;
+    background-image: url('../images/site_visit_grey_200x150.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 70%;
+    background-color: #ffffff;
+    min-height: 300px;
+}
+
+#site_visit {
+    background-image: url('../images/site_visit_grey_200x150.png');
+}
+
+
+#design {
+    background-image: url('../images/design_grey_200x150.png');
+}
+
+
+#installation {
+    background-image: url('../images/installation_grey_200x150.png');
+}
+
+
+#maintenance {
+    background-image: url('../images/maintenance_grey_200x150.png');
+}
+
+#permits {
+    background-image: url('../images/permits_grey_200x150.png');
+}
+
+#marketing {
+    background-image: url('../images/marketing_grey_200x150.png');
+}
+
+
+h6{
+    
+    font-size: 22px;
+    text-align: Right;
+    color: #595959;
+    
+}
+
+
+h5{
+    
+    font-size: 22px;
+    text-align: Left;
+    color: #595959;
+    
+}
+
+
+
+h4{
+    
+    font-size: 22px;
+    text-align: center;
+    color: #595959;
+    
+}
+
+h3{
+    
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    color: #999999;
+    margin-top: 40px;
+}
+
+h2{
+
+    font-size: 26px;
+    font-weight: bold;
+    text-align: center;
+    color: #00b050;
+}
+
+h1{
+ 
+    font-size: 48px;
+    font-weight: bold;
+    text-align: center;
+    color: #000000;
+    margin: 300px 500px;
+    opacity:0.4;
+}
+
+h1 a{
+    color: #ffffff;
+    text-decoration: none;
+}
+
+h1 a:hover{
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.quote-lg{
+    font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+    font-size: 22px;
+    color: #000000;
+    font-style: italic;
+    padding: 0px 40px;
+}
+
+.quote-sm{
+    font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+    font-size: 16px;
+    color: #ffffff;
+    font-style: normal;
+    background-color: #00b050;
+    border-radius: 4px;
+    padding: 0px 40px;
+}
+
+.site-navbar{
+    padding-top: 20px;
+    padding-bottom: 10px;
+    border: none;
+    box-shadow: none;
+    margin-bottom: 0px !important;
+    background: #ffffff;
+    /*opacity: .9;*/
+    background-color: rgba(255, 255, 255, .9);
+    z-index: 999;
+}
+
+.margin-lg{
+    margin-bottom: 150px;
+}
+
+.social-link{
+    display: inline-block;
+    padding: 5px;
+}
+
+.contact{
+    font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+    font-size: 18px;
+    color: #ffffff;
+}
+
+.expense-range{
+    font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+    font-size: 20px;
+    border: 1px solid #bdbdbd;
+    border-radius: 0px;
+    padding: 4px 8px;
+    color: #7f7f7f;
+}
+
+.sup{
+    vertical-align: super;
+    font-size: .83em;
+    color: #00b050;
+}
+
+.amount{
+    font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
+    font-size: 32px;
+    color: #00b050;
+}
+
+.error{
+    color: #ff0000;
+    text-align: center;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.success{
+    color: #00b050;
+    text-align: center;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+@media only screen and (min-width: 320px) and (max-width: 640px)
+{
+    h1{ font-size: 32px; }
+    .overlay{ margin-top: 50px; }
+    .caption{ font-size: 22px; }
+    .section-how{ padding: 70px 50px; }
+    .image-overlay-text{ font-size: 12px; }
+    .headerLogo{width:100px}
+
+}
+
+@media(min-width: 641px) and (max-width: 767px){
+    .section-how{ padding: 70px 200px; }
+    .image-overlay-text{ font-size: 16px; }
+    .headerLogo{width:120px}
+
+}
+
+@media(min-width: 768px) and (max-width: 990px){
+    .section-how{ padding: 70px 150px; }
+    .image-overlay-text{ font-size: 20px; }
+.nav-opt-sm{font-size:16px}
+
+.country-overlay .row {
+margin-top:-5%;
+
+}
+.country-overlay .row .title {
+font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+font-size:35px;
+}
+
+.country-overlay .row .col-xs-4 a {
+font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+font-size:25px;
+margin-left:-5%
+}
+
+.headerLogo{width:150px}
+
+
+}
+
+@media(max-width: 901px){
+    .brand-name{ font-size: 30px; }
+    .nav-opt-sm{font-size:16px}
+    img.navbar-brand{
+        width:65px;
+        height:65px;
+        margin-left:10px;
+        margin-top:-15px;
+        padding: 5px;
+    }
+#headVideo{display:none}
+.country-overlay .row {
+margin-top:-20%;
+
+}
+.country-overlay .row .title {
+font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+font-size:25px;
+}
+
+.country-overlay .row .col-xs-4 a {
+font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+font-size:25px;
+margin-left:-5%
+}
+
+#mainHeadingCES{display:none;}
+
+#mobileFourSections{display:block;}
+#desktopFourSection{display:none;}
+#testDriveHeading{display:none;}
+#testDriveHeadingMobile{display:block;}
+.headerLogo{width:180px}
+
+}
+
+
+
+
+
+
+
+@media(min-width: 901px){
+  
+#headImage{display:none}
+
+.country-overlay .row {margin-top:-5%;}
+.country-overlay .row .title {font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif; font-size:45px;}
+.country-overlay .row .col-xs-4 a {font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;}
+
+#mainHeadingCES{display:block;}
+#mobileFourSections{display:none;}
+#desktopFourSection{display:block;}
+#testDriveHeading{display:block;}
+#testDriveHeadingMobile{display:none;}
+.headerLogo{width:260px}
+
+}
+
+
+
+/* Full width navigation */
+.nav { margin-bottom: 0; }
+.nav > li.dropdown.open { position: static; }
+.nav > li.dropdown.open .dropdown-menu {display:block; width: 100%; text-align: center; right:0; }
+.dropdown-menu>li { display: inline-block; width: 32.65%;}
+
+.bg-image-container {
+    position: relative;
+    overflow: hidden;
+    padding: 0px !important;
+    margin: 0px !important;
+    background: #000000;
+}
+
+img.bg-image {
+    background: #000000;
+    //min-width: 100%;
+    max-width:100%;
+    max-height:100%;
+/*    width:auto;
+    height: auto;*/
+}
+
+.image-overlay{
+    width:100%;
+    height:100%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    text-align: center;
+    padding: 10px;
+    color: #AAD233;
+    background: #000000;
+    opacity: .75;
+}
+
+.image-overlay-text{
+    width:100%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+    text-align: center;
+    padding: 10px;
+    color: #AAD233;
+    display: block;
+}
+
+#othersmenu{
+    padding: 0px !important;
+    background: #ffffff;
+}
+
+.section-how-commercial .col-md-2, .section-how-commercial .col-sm-4{
+    padding: 2px !important;
+}
+
+.section-how-commercial .how{
+    margin: 2px !important;
+}
+
+.section-how-commercial h3{
+    font-size: 16px !important;
+}
+
+.section-how-commercial .animate{
+    font-size: 14px !important;
+}
+
+.country-overlay{
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    z-index: 999;
+    background-color: rgba(0, 0, 0, .85);
+    color: #FFFFFF;
+    font-size: 40px;
+    font-weight: bold;
+    padding-top: 150px;
+    text-align: center;
+    line-height: 3em;
+}
+
+.country-overlay a{
+    color: #FFFFFF;
+    padding: 4px 8px;
+}
+
+.country-overlay a:hover, .country-overlay a:active{
+    background-color: rgba(0, 0, 0, .25);
+    color: #afd9ee;
+    text-decoration: none;
+}
+
+.country-overlay .title{
+    color: #afd9ee;
+    padding: 4px 8px;
+}
+
+
+
+#mainHeadingCES{
+font-size:60px; 
+width:100%;
+text-align:center; 
+margin-left:0px; 
+margin-top:30%;
+font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+}
+
+
+.mobileSectionsHover{
+height:300px;
+width:200px;
+background-color:white;
+}
+
+.mobileSectionsHover img{
+height:100px;
+width:130px;
+margin:100px auto;
+}
+
+.mobileSectionHead{
+font-size:30px;
+margin-top:100px;
+color:grey;
+    font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+
+}
+
+
+.mobileSectionsSubHead{
+    font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+COLOR:green;
+}
+
+.sectionOverlay{ 
+background:rgba(0,0,0,.75);
+               text-align:center;
+               padding:45px 0 66px 0;       
+margin-top:-300px;
+height:300px;
+}
+
+.sectionOverlay p {
+font-size:15px;
+color:#C5E997;
+    font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+padding:10px;
+}
+
+#siteVisitOverlay{
+      opacity:0;
+               -webkit-transition: opacity .25s ease;
+-moz-transition: opacity .25s ease;
+}
+
+
+#designOverlay{
+      opacity:0;
+               -webkit-transition: opacity .25s ease;
+-moz-transition: opacity .25s ease;
+}
+
+#installationOverlay{
+      opacity:0;
+               -webkit-transition: opacity .25s ease;
+-moz-transition: opacity .25s ease;
+}
+
+#maintenanceOverlay{
+      opacity:0;
+               -webkit-transition: opacity .25s ease;
+-moz-transition: opacity .25s ease;
+}
+
+#marketingOverlay{
+      opacity:0;
+               -webkit-transition: opacity .25s ease;
+-moz-transition: opacity .25s ease;
+}
+
+#permitsOverlay{
+      opacity:0;
+               -webkit-transition: opacity .25s ease;
+-moz-transition: opacity .25s ease;
+}
+
+
+
+#testDriveHeadingMobile{
+background-color:#00b050;
+text-align:center;
+font-size:15px;
+border-radius:10px;
+color:white;
+width:300px;
+margin:50px 0px;
+
+}

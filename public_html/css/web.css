@@ -1,0 +1,589 @@
+body,html{
+font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+overflow-x:hidden;
+  text-shadow: none;
+font-size: 13px;
+}
+.navbar-default{
+	background-color:#fff;
+	border-color:#fff;
+}
+.navbar{
+	margin-bottom:0;
+	margin-right:50px;
+}
+
+.container{
+	min-height:70px;
+}
+
+.logo{
+    padding-left:60px;
+}
+
+.panel{
+	border:2px solid #00b050;
+	border-radius:0;
+	margin-left:60px;
+	margin-right:60px;
+
+
+}
+
+.panel-body{
+	padding:0;
+}
+
+
+.conspt{
+	height:80px;
+	margin-top: 20px;
+    margin-left:5px;
+	margin-right:5px;
+}
+
+.solar{
+	height:80px;
+	margin-top: 20px;
+    margin-left:5px;
+	margin-right:5px;
+}
+
+.grid{
+	height:80px;
+	margin-top: 20px;
+    margin-left:5px;
+	margin-right:5px;
+}
+.conspt div{
+	float:left;
+	clear:none;
+}
+.solar div{
+	float:left;
+	clear:none;
+}
+.grid div{
+	float:left;
+	clear:none;
+}
+
+ .text{
+	padding-top:16px;
+	padding-left:6px;
+	padding-right:1px;
+	font-size:12px;
+	width:60%;
+	font-weight:bold;
+}
+
+.energy .text {
+font-size:15px;
+}
+
+ .doughnut{
+	margin-left:1px;
+	margin-right:8px;
+	height:80px;
+	width:80px;
+	right:0;
+}
+
+
+
+.doughnutText{
+top:-55px;
+position:relative;
+text-align:center;
+width:100%;
+}
+
+.energy{
+	height:100px;
+	margin-top: 30px;
+    margin-left: 5px;
+
+
+}
+.energy div {
+	float:left;
+	clear:none;
+}
+
+#greenEnergyText::after{
+content:"%";
+}
+
+.col-md-8{
+	padding:0;
+}
+
+.medcol{
+	margin-top:55px;
+}
+
+.medcol .panel-body{
+	width:80%;	
+/* 	min-width:300px */
+	
+}
+
+.bottombar {
+	margin-left:57px;
+}
+
+.bottombar div{
+	float:left;
+	clear:none;
+	
+}
+
+.lngbtn{
+	float:left;
+	clear:none;
+}
+
+.fa-2x{
+	border-radius:0;
+	border-color:#eee;
+	
+}
+.billSavingText{
+font-size:30px;
+text-align:center;
+}
+
+.billSavingIndia::before{
+content:"₹ ";
+}
+
+.billSavingUAE::before{
+content:"AED ";
+font-size:20px;
+}
+
+
+
+.carbonText::after{
+content:" KG";
+}
+
+.distanceText::after{
+content:" KM \A(Not Driven)";
+white-space: pre;
+}
+
+
+.btn-sm{
+	font-size:11px;
+	border-radius:0;
+}
+
+.btn-sm:hover{
+	background-color:green;
+}
+
+.btn-sm:active{
+	background-color:green;
+}
+
+.bill{
+	padding-top:80px;
+	text-align:center;
+	font-size:15px
+}
+
+
+
+.save{
+	text-align:center;
+	font-size:15px;
+	padding-bottom:20px;
+margin-top:80px;
+
+
+}
+
+.noval{
+	margin-left:30px;
+	font-weight:bold;
+	font-size:20px;
+	text-align:center;
+}
+
+.value div{
+	float:left;
+	clear:none;
+}
+
+
+.detailViewButton{
+background:gray;
+color:white;
+width:100px;
+text-align:center;
+text-shadow:none;
+}
+
+.legends{
+width:8px;
+height:8px;
+}
+
+.cO2CarImages{
+height:40px;width:40px;
+margin-left:-10px;
+margin-top:-5px
+}
+
+.savingsText{
+font-size:15px; text-align:right;
+}
+
+ul#menu li {display:inline;} 
+
+
+.marginGreenDiv{margin-top:15px;margin-left:-15px}
+
+.profile{
+	margin-left:10px;
+	margin-top:50px;
+}
+
+.profile p{
+	margin-bottom:0;
+}
+
+.alerts{
+	margin-left:30px;
+	margin-top:50px;
+}
+
+.alertsinfo{
+	margin-left:30px;
+	font-size:12px;
+}
+.how{
+	margin-left:20px;
+}
+.how h4{
+	font-weight:bold;
+	margin-top:70px;
+	margin-bottom:20px;
+	
+}
+.how  li{
+	font-size:10px;
+}
+
+.settings {
+	margin-left:30px;
+	margin-top:50px;
+}
+
+.contact {
+	margin-left:30px;
+	margin-top:90px;
+}
+
+.number{
+	margin-left:30px;
+	margin-top:50px;
+}
+
+.refer   a{
+    float:left;
+    clear:none;	
+}
+.refer {
+	width:90%;
+	height:17%;
+}
+
+.pop-up input{
+	margin-bottom:10px;
+	background-color:#777;
+}
+
+.modal-header{
+	border-bottom:none;
+	text-align:center;
+}
+.modal-content{
+	    background-color: rgba(260,260,260,0.0);
+		-webkit-box-shadow:none;
+		border:none;
+}
+
+.modal-open .modal{
+	    background-color: rgba(260, 260,260,0.78);
+}
+.modal-footer{
+	border-top:none;
+	text-align:center;
+}
+
+.modal-dialog {
+    width: 230px;
+}
+
+ td{
+	background-color:yellow;
+}
+
+table{
+	width:100%;
+	border-collapse: separate;
+	border-spacing: 2px;
+    -webkit-border-horizontal-spacing: 2px;
+    -webkit-border-vertical-spacing: 2px;
+}
+
+table th,td {
+	width:30%;
+	text-align:center;
+}
+
+.refer .fa-2x{
+	padding-left:240px;
+	padding-top:10px;
+}
+
+ .front input {
+	margin-bottom:20px;
+	position: relative;
+	height:40px;
+	border:2px solid #d3d3d3;
+}
+.sign-in{
+	text-align:center;
+	margin-bottom:20px;
+	margin-top:80px;
+}
+
+	.demo .container{
+		padding-left:0;
+	}
+	
+.demo .btn-default{
+	background-color:#ccc;
+}
+.demo .btn {
+	border-radius: 0;
+	width:200px;
+	height:50px;
+	margin-top:30px;
+	font-size:25px
+}
+.graph div{
+	float:left;
+	clear:none;
+	margin-top:15px;
+}
+
+.indicators {
+	font-size:10px;
+	vertical-align:center;
+	text-align:center;
+	width:84%;	
+}
+
+
+
+#companyHeader{width:100%;}
+
+#menu{height:40px;margin-right:20px;}
+
+#menu div {
+float:right;
+margin:2px;
+font-size:15px;
+padding:5px 20px;
+color:white;
+cursor:pointer;
+background-color:#B0B0B0;
+}
+
+#bottomButtons div{
+/* float:left; */
+/* width:50px; */
+display:inline;
+margin:2px;
+font-size:15px;
+padding:5px 10px;
+color:white;
+cursor:pointer;
+background-color:#B0B0B0;
+text-shadow:none;
+
+}
+
+.incDecButtons{
+background:none;
+border:none;
+ outline: none;
+box-shadow:none; 
+}
+
+.incDecButtons:focus{
+    outline: none;   
+}
+
+
+#staticPageLeftSection h3{
+color:white;
+}
+
+#staticPageLeftSection h5{
+color:white;
+}
+
+/**************Mobile Website CSS***************/
+
+ #mobileDoughnutRow{
+     background-color: #404040;
+     padding:10px 0px 10px 20px;
+ }
+        
+ #mobileDoughnutRow div div{
+     text-transform: uppercase; 
+         text-shadow: none;
+         font-size:11px;     
+ }
+
+#mobileDoughnutRow div{
+padding:0px;
+}
+
+
+/*** Loader ***/
+.modal
+        {
+            position: fixed;
+            z-index: 999;
+            height: 100%;
+            width: 100%;
+            top: 0;
+            left: 0;
+                   
+        }
+        .center
+        {
+            z-index: 1000;
+            margin: 300px auto;
+            padding: 10px;
+            width: 65px;
+            background-color: White;
+            border-radius: 10px;
+            filter: alpha(opacity=100);
+            opacity: 1;
+            -moz-opacity: 1;
+        }
+        .center img
+        {
+            height: 50px;
+            width: 50px;
+        }
+
+
+
+
+@media (max-width: 1100px){
+
+ 
+	.text{
+	font-size:12px;
+	}
+	
+	.cO2CarImages {
+   
+   	 margin-left: -10px;
+   	 }
+
+   	 .savingsText{
+	font-size:15px; 
+	text-align:right;
+	}
+	
+	.value div{
+		float:center;
+		text-align:center;
+	}
+	
+	.conspt div{
+	    float:none;
+        margin:0 auto;
+        text-align:center;		
+	}
+	.conspt .text{
+		padding-top:0;
+	}
+	.solar div{
+	    float:none;
+        margin:0 auto;
+        text-align:center;		
+	}
+	.solar{
+		margin-top:4px;
+                height:80px;
+	}
+	.solar  .text{
+		padding-top:5px;
+	}
+	.grid{
+		margin-top:4px;
+	}
+	.grid div{
+	    float:none;
+        margin:0 auto;
+        text-align:center;		
+	}
+	.grid .text{
+		padding-top:10px;
+	}
+	.energy div{
+		float:none;
+        margin:0 auto;
+        text-align:center;
+	}
+	.energy{
+		height:130px;margin-top: 0px;
+	}
+	.energy .text{
+		padding-top:0;
+	}
+
+#bottomButtons div {font-size:12px;}
+.marginGreenDiv{margin-top:0px; margin-left:0px}
+
+}
+
+
+@media (max-width: 769px){
+#desktopWebsite{display:none;}
+#mobileWebsite{display:block;}
+.billSavingIndia::before{ content:"SAVED ₹  ";}
+.carbonText::after{ content:" KG CO2";}
+.billSavingText{font-size:15px;padding-left:0px}
+ul#menu li ,.detailViewButton {font-size:12px}
+.doughnutText {top: -38px;}
+
+.doughnut{	height:50px;	width:50px;}
+
+
+}
+
+@media (min-width: 769px){
+
+#desktopWebsite{display:block;}
+#mobileWebsite{display:none;}
+ul#menu li,.detailViewButton {font-size:15px}
+.doughnutText { top: -43px;}
+.doughnut{height:60px; width:60px;}
+}
+
+@media (max-width:1100px) and (min-width:769px) {
+  .doughnutText {top: -40px;}
+
+.doughnut{	height:50px;	width:50px;}  
+}​

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Clenergize</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/web.css" rel="stylesheet">     
+  </head>
+<body>
+
+    <div id="companyHeader">
+        <img src="../images/companyHeader.png" style="margin-left:20px; height:70px"/>
+    </div>
+
+    <div id="menu">
+        <div  class="supportButton" onclick="supportClick()">SUPPORT</div>
+        <div  class="alertButton" style="background-color:#00b050">ALERTS</div>
+        <div  class="dashboardButton" onclick="dashboardClick()" >DASHBOARD</div>
+    </div>
+
+	<div class="row" style="margin-left:-40px; margin-right:-40px">
+        <div class="panel">
+			<div class="panel-body">
+                
+			  <div class="col-xs-3" id="staticPageLeftSection" style="background-color:#404040; min-height:460px;">
+                  		<h3 style="font-weight:bold">PROFILE</h3>
+                  		
+                  		<h5>Name</h5>
+                     		<h5>Email</h5>
+                     		<h5>Contact</h5>
+                     		<h5>Address</h5>
+                     		<br><br><bR>
+                     		
+                     		<h5>Plant Size</h5>
+                     		<h5>Connection Date</h5>
+			 </div>
+                     
+                     
+			
+			
+			<div class="col-xs-9">
+			<div style="margin:50px;">
+				<h3  style="font-weight:bold">ALERTS</h3>
+                  		
+                  		<h5 style="color:black">There are no alerts at present!</h5>    
+ </div>
+			 </div>
+                     
+				
+			
+			</div>
+	    </div>
+    </div>
+
+
+</body>
+
+<script>
+
+function supportClick() {
+    
+    document.getElementsByClassName("supportButton")[0].style.backgroundColor = "#00b050";
+    document.getElementsByClassName("alertButton")[0].style.backgroundColor = "#B0B0B0";
+    document.getElementsByClassName("dashboardButton")[0].style.backgroundColor = "#B0B0B0";
+    
+    window.location = "support.html";
+}
+
+function dashboardClick() {
+    
+    document.getElementsByClassName("supportButton")[0].style.backgroundColor = "#B0B0B0";
+    document.getElementsByClassName("alertButton")[0].style.backgroundColor = "#B0B0B0";
+    document.getElementsByClassName("dashboardButton")[0].style.backgroundColor = "#00b050";
+    
+    
+    window.location = "WebApp.html";
+}
+</script>
+
+</html>
