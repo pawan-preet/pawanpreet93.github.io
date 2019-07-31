@@ -1,0 +1,62 @@
+[19-Aug-2015 19:41:23 Etc/GMT] PHP Parse error:  syntax error, unexpected '=' in /home/clenemip/public_html/Consult.php on line 47
+[19-Aug-2015 19:43:26 Etc/GMT] PHP Parse error:  syntax error, unexpected '=' in /home/clenemip/public_html/Consult.php on line 47
+[19-Aug-2015 19:43:40 Etc/GMT] PHP Parse error:  syntax error, unexpected '=' in /home/clenemip/public_html/Consult.php on line 47
+[19-Aug-2015 19:48:14 Etc/GMT] PHP Parse error:  syntax error, unexpected '=' in /home/clenemip/public_html/Consult.php on line 67
+[19-Aug-2015 19:48:17 Etc/GMT] PHP Parse error:  syntax error, unexpected '=' in /home/clenemip/public_html/Consult.php on line 67
+[19-Aug-2015 19:48:21 Etc/GMT] PHP Parse error:  syntax error, unexpected '=' in /home/clenemip/public_html/Consult.php on line 67
+[23-Aug-2015 14:34:23 Etc/GMT] PHP Parse error:  syntax error, unexpected '=' in /home/clenemip/public_html/Consult.php on line 95
+[23-Aug-2015 14:34:31 Etc/GMT] PHP Parse error:  syntax error, unexpected '=' in /home/clenemip/public_html/Consult.php on line 95
+[19-Oct-2015 08:56:49 Etc/GMT] PHP Warning:  include(template1.php): failed to open stream: No such file or directory in /home/clenemip/public_html/test.php on line 304
+[19-Oct-2015 08:56:49 Etc/GMT] PHP Warning:  include(template1.php): failed to open stream: No such file or directory in /home/clenemip/public_html/test.php on line 304
+[19-Oct-2015 08:56:49 Etc/GMT] PHP Warning:  include(): Failed opening 'template1.php' for inclusion (include_path='.:/opt/alt/php54/usr/share/pear:/opt/alt/php54/usr/share/php') in /home/clenemip/public_html/test.php on line 304
+[19-Oct-2015 08:56:59 Etc/GMT] PHP Warning:  include(template1.php): failed to open stream: No such file or directory in /home/clenemip/public_html/test.php on line 304
+[19-Oct-2015 08:56:59 Etc/GMT] PHP Warning:  include(template1.php): failed to open stream: No such file or directory in /home/clenemip/public_html/test.php on line 304
+[19-Oct-2015 08:56:59 Etc/GMT] PHP Warning:  include(): Failed opening 'template1.php' for inclusion (include_path='.:/opt/alt/php54/usr/share/pear:/opt/alt/php54/usr/share/php') in /home/clenemip/public_html/test.php on line 304
+[19-Oct-2015 11:21:07 Etc/GMT] PHP Warning:  include(template1.php): failed to open stream: No such file or directory in /home/clenemip/public_html/test.php on line 304
+[19-Oct-2015 11:21:07 Etc/GMT] PHP Warning:  include(template1.php): failed to open stream: No such file or directory in /home/clenemip/public_html/test.php on line 304
+[19-Oct-2015 11:21:07 Etc/GMT] PHP Warning:  include(): Failed opening 'template1.php' for inclusion (include_path='.:/opt/alt/php54/usr/share/pear:/opt/alt/php54/usr/share/php') in /home/clenemip/public_html/test.php on line 304
+[19-Oct-2015 11:21:08 Etc/GMT] PHP Warning:  include(template1.php): failed to open stream: No such file or directory in /home/clenemip/public_html/test.php on line 304
+[19-Oct-2015 11:21:08 Etc/GMT] PHP Warning:  include(template1.php): failed to open stream: No such file or directory in /home/clenemip/public_html/test.php on line 304
+[19-Oct-2015 11:21:08 Etc/GMT] PHP Warning:  include(): Failed opening 'template1.php' for inclusion (include_path='.:/opt/alt/php54/usr/share/pear:/opt/alt/php54/usr/share/php') in /home/clenemip/public_html/test.php on line 304
+[19-Oct-2015 11:21:13 Etc/GMT] PHP Warning:  include(template1.php): failed to open stream: No such file or directory in /home/clenemip/public_html/test.php on line 304
+[19-Oct-2015 11:21:13 Etc/GMT] PHP Warning:  include(template1.php): failed to open stream: No such file or directory in /home/clenemip/public_html/test.php on line 304
+[19-Oct-2015 11:21:13 Etc/GMT] PHP Warning:  include(): Failed opening 'template1.php' for inclusion (include_path='.:/opt/alt/php54/usr/share/pear:/opt/alt/php54/usr/share/php') in /home/clenemip/public_html/test.php on line 304
+[19-Oct-2015 11:21:25 Etc/GMT] PHP Warning:  include(template1.php): failed to open stream: No such file or directory in /home/clenemip/public_html/test.php on line 304
+[19-Oct-2015 11:21:25 Etc/GMT] PHP Warning:  include(template1.php): failed to open stream: No such file or directory in /home/clenemip/public_html/test.php on line 304
+[19-Oct-2015 11:21:25 Etc/GMT] PHP Warning:  include(): Failed opening 'template1.php' for inclusion (include_path='.:/opt/alt/php54/usr/share/pear:/opt/alt/php54/usr/share/php') in /home/clenemip/public_html/test.php on line 304
+[30-Jul-2016 13:57:05 Etc/GMT] PHP Warning:  require(../phpmailer/PHPMailerAutoload.php): failed to open stream: No such file or directory in /home/clenemip/public_html/index.php on line 210
+[30-Jul-2016 13:57:05 Etc/GMT] PHP Warning:  require(../phpmailer/PHPMailerAutoload.php): failed to open stream: No such file or directory in /home/clenemip/public_html/index.php on line 210
+[30-Jul-2016 13:57:05 Etc/GMT] PHP Fatal error:  require(): Failed opening required '../phpmailer/PHPMailerAutoload.php' (include_path='.:/opt/alt/php54/usr/share/pear:/opt/alt/php54/usr/share/php') in /home/clenemip/public_html/index.php on line 210
+[24-Aug-2016 12:00:49 Etc/GMT] PHP Warning:  require(../phpmailer/PHPMailerAutoload.php): failed to open stream: No such file or directory in /home/clenemip/public_html/Consult.php on line 686
+[24-Aug-2016 12:00:49 Etc/GMT] PHP Warning:  require(../phpmailer/PHPMailerAutoload.php): failed to open stream: No such file or directory in /home/clenemip/public_html/Consult.php on line 686
+[24-Aug-2016 12:00:49 Etc/GMT] PHP Fatal error:  require(): Failed opening required '../phpmailer/PHPMailerAutoload.php' (include_path='.:/opt/alt/php54/usr/share/pear:/opt/alt/php54/usr/share/php') in /home/clenemip/public_html/Consult.php on line 686
+[29-Aug-2016 08:57:33 Etc/GMT] PHP Warning:  require(../phpmailer/PHPMailerAutoload.php): failed to open stream: No such file or directory in /home/clenemip/public_html/index.php on line 210
+[29-Aug-2016 08:57:33 Etc/GMT] PHP Warning:  require(../phpmailer/PHPMailerAutoload.php): failed to open stream: No such file or directory in /home/clenemip/public_html/index.php on line 210
+[29-Aug-2016 08:57:33 Etc/GMT] PHP Fatal error:  require(): Failed opening required '../phpmailer/PHPMailerAutoload.php' (include_path='.:/opt/alt/php54/usr/share/pear:/opt/alt/php54/usr/share/php') in /home/clenemip/public_html/index.php on line 210
+[29-Aug-2016 08:57:46 Etc/GMT] PHP Warning:  require(../phpmailer/PHPMailerAutoload.php): failed to open stream: No such file or directory in /home/clenemip/public_html/index.php on line 210
+[29-Aug-2016 08:57:46 Etc/GMT] PHP Warning:  require(../phpmailer/PHPMailerAutoload.php): failed to open stream: No such file or directory in /home/clenemip/public_html/index.php on line 210
+[29-Aug-2016 08:57:46 Etc/GMT] PHP Fatal error:  require(): Failed opening required '../phpmailer/PHPMailerAutoload.php' (include_path='.:/opt/alt/php54/usr/share/pear:/opt/alt/php54/usr/share/php') in /home/clenemip/public_html/index.php on line 210
+[13-Oct-2016 15:21:48 Etc/GMT] PHP Warning:  require(../phpmailer/PHPMailerAutoload.php): failed to open stream: No such file or directory in /home/clenemip/public_html/index.php on line 210
+[13-Oct-2016 15:21:48 Etc/GMT] PHP Warning:  require(../phpmailer/PHPMailerAutoload.php): failed to open stream: No such file or directory in /home/clenemip/public_html/index.php on line 210
+[13-Oct-2016 15:21:48 Etc/GMT] PHP Fatal error:  require(): Failed opening required '../phpmailer/PHPMailerAutoload.php' (include_path='.:/opt/alt/php54/usr/share/pear:/opt/alt/php54/usr/share/php') in /home/clenemip/public_html/index.php on line 210
+[13-Oct-2016 15:22:17 Etc/GMT] PHP Warning:  require(../phpmailer/PHPMailerAutoload.php): failed to open stream: No such file or directory in /home/clenemip/public_html/index.php on line 210
+[13-Oct-2016 15:22:17 Etc/GMT] PHP Warning:  require(../phpmailer/PHPMailerAutoload.php): failed to open stream: No such file or directory in /home/clenemip/public_html/index.php on line 210
+[13-Oct-2016 15:22:17 Etc/GMT] PHP Fatal error:  require(): Failed opening required '../phpmailer/PHPMailerAutoload.php' (include_path='.:/opt/alt/php54/usr/share/pear:/opt/alt/php54/usr/share/php') in /home/clenemip/public_html/index.php on line 210
+[13-Oct-2016 15:22:21 Etc/GMT] PHP Warning:  require(../phpmailer/PHPMailerAutoload.php): failed to open stream: No such file or directory in /home/clenemip/public_html/index.php on line 210
+[13-Oct-2016 15:22:21 Etc/GMT] PHP Warning:  require(../phpmailer/PHPMailerAutoload.php): failed to open stream: No such file or directory in /home/clenemip/public_html/index.php on line 210
+[13-Oct-2016 15:22:21 Etc/GMT] PHP Fatal error:  require(): Failed opening required '../phpmailer/PHPMailerAutoload.php' (include_path='.:/opt/alt/php54/usr/share/pear:/opt/alt/php54/usr/share/php') in /home/clenemip/public_html/index.php on line 210
+[19-Jan-2017 16:33:00 Etc/GMT] PHP Warning:  require(../phpmailer/PHPMailerAutoload.php): failed to open stream: No such file or directory in /home/clenemip/public_html/index.php on line 686
+[19-Jan-2017 16:33:00 Etc/GMT] PHP Warning:  require(../phpmailer/PHPMailerAutoload.php): failed to open stream: No such file or directory in /home/clenemip/public_html/index.php on line 686
+[19-Jan-2017 16:33:00 Etc/GMT] PHP Fatal error:  require(): Failed opening required '../phpmailer/PHPMailerAutoload.php' (include_path='.:/opt/alt/php54/usr/share/pear:/opt/alt/php54/usr/share/php') in /home/clenemip/public_html/index.php on line 686
+[02-Mar-2017 04:33:22 Etc/GMT] PHP Warning:  require(../phpmailer/PHPMailerAutoload.php): failed to open stream: No such file or directory in /home/clenemip/public_html/index.php on line 686
+[02-Mar-2017 04:33:22 Etc/GMT] PHP Warning:  require(../phpmailer/PHPMailerAutoload.php): failed to open stream: No such file or directory in /home/clenemip/public_html/index.php on line 686
+[02-Mar-2017 04:33:22 Etc/GMT] PHP Fatal error:  require(): Failed opening required '../phpmailer/PHPMailerAutoload.php' (include_path='.:/opt/alt/php54/usr/share/pear:/opt/alt/php54/usr/share/php') in /home/clenemip/public_html/index.php on line 686
+[12-Mar-2017 21:00:24 Etc/GMT] PHP Warning:  include(templateNew.php): failed to open stream: No such file or directory in /home/clenemip/public_html/test.php on line 403
+[12-Mar-2017 21:00:24 Etc/GMT] PHP Warning:  include(templateNew.php): failed to open stream: No such file or directory in /home/clenemip/public_html/test.php on line 403
+[12-Mar-2017 21:00:24 Etc/GMT] PHP Warning:  include(): Failed opening 'templateNew.php' for inclusion (include_path='.:/opt/alt/php54/usr/share/pear:/opt/alt/php54/usr/share/php') in /home/clenemip/public_html/test.php on line 403
+[17-Mar-2017 02:16:11 Etc/GMT] PHP Warning:  include(templateNew.php): failed to open stream: No such file or directory in /home/clenemip/public_html/test.php on line 403
+[17-Mar-2017 02:16:11 Etc/GMT] PHP Warning:  include(templateNew.php): failed to open stream: No such file or directory in /home/clenemip/public_html/test.php on line 403
+[17-Mar-2017 02:16:11 Etc/GMT] PHP Warning:  include(): Failed opening 'templateNew.php' for inclusion (include_path='.:/opt/alt/php54/usr/share/pear:/opt/alt/php54/usr/share/php') in /home/clenemip/public_html/test.php on line 403
+[20-Mar-2017 04:11:31 Etc/GMT] PHP Warning:  include(templateNew.php): failed to open stream: No such file or directory in /home/clenemip/public_html/test.php on line 403
+[20-Mar-2017 04:11:31 Etc/GMT] PHP Warning:  include(templateNew.php): failed to open stream: No such file or directory in /home/clenemip/public_html/test.php on line 403
+[20-Mar-2017 04:11:31 Etc/GMT] PHP Warning:  include(): Failed opening 'templateNew.php' for inclusion (include_path='.:/opt/alt/php54/usr/share/pear:/opt/alt/php54/usr/share/php') in /home/clenemip/public_html/test.php on line 403

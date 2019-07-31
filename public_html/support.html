@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Clenergize</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/web.css" rel="stylesheet">     
+  </head>
+<body>
+
+    <div id="companyHeader">
+        <img src="../images/companyHeader.png" style="margin-left:20px; height:70px"/>
+    </div>
+
+    <div id="menu">
+        <div  class="supportButton" onclick="supportClick()" style="background-color:#00b050">SUPPORT</div>
+        <div  class="alertButton" onclick="alertClick()" >ALERTS</div>
+        <div  class="dashboardButton" onclick="dashboardClick()" >DASHBOARD</div>
+    </div>
+<div class="row" style="margin-left:-40px; margin-right:-40px">
+        <div class="panel">
+			<div class="panel-body">
+                
+			  <div class="col-xs-3" id="staticPageLeftSection" style="background-color:#404040; min-height:460px;">
+                  		<h3 style="font-weight:bold">PROFILE</h3>
+                  		
+                  		<h5>Name</h5>
+                     		<h5>Email</h5>
+                     		<h5>Contact</h5>
+                     		<h5>Address</h5>
+                     		<br><br><bR>
+                     		
+                     		<h5>Plant Size</h5>
+                     		<h5>Connection Date</h5>
+			 </div>
+                     
+                     
+			
+			
+			<div class="col-xs-9">
+			<div style="margin:50px;">
+				<h3 style="font-weight:bold">SETTINGS</h3>
+                  		
+                  		<h4 style="color:black">ACCOUNT SETTINGS</h4>    
+                  		<h4 style="color:black">BILL SAVING SETTINGS</h4>    
+ 			</div>
+
+<div style="margin:50px;">
+				<h3 style="font-weight:bold">CONTACT US</h3>
+                  		
+                  		<h4 style="color:black"><a href="mailto:support@clenergize.com">support@clenergize.com</a></h4>    
+ 			</div>
+
+			 </div>
+                     
+				
+			
+			</div>
+	    </div>
+    </div>
+
+
+
+</body>
+
+<script>
+
+function dashboardClick() {
+    
+    document.getElementsByClassName("supportButton")[0].style.backgroundColor = "#B0B0B0";
+    document.getElementsByClassName("alertButton")[0].style.backgroundColor = "#B0B0B0";
+    document.getElementsByClassName("dashboardButton")[0].style.backgroundColor = "#00b050";
+    
+    window.location = "WebApp.html";
+}
+
+function alertClick() {
+    
+    document.getElementsByClassName("supportButton")[0].style.backgroundColor = "#B0B0B0";
+    document.getElementsByClassName("alertButton")[0].style.backgroundColor = "#00b050";
+    document.getElementsByClassName("dashboardButton")[0].style.backgroundColor = "#B0B0B0";
+    
+    
+    window.location = "alerts.html";
+}
+</script>
+
+</html>

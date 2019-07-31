@@ -1,0 +1,95 @@
+.vk-accordion {
+    padding: 0 !important;
+    background: none !important;
+    border: none !important;
+    outline: none !important;
+    text-align: left;
+}
+
+.vk-accordion h3{
+    text-align: left;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    cursor: hand;
+}
+
+.faq-heading{
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.faq-top-heading{
+    font-size: 40px;
+    font-weight: bold;
+    color: #595959;
+}
+
+.section-faq{
+    padding: 40px 80px;
+}
+
+.section-faq-top{
+    padding: 40px 80px 0px 80px;
+    background: #F2F2F2;
+}
+
+.section-faq-top a{
+    padding: 16px;
+    margin: 0px;
+    font-size: 24px;
+    color: #000000;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.section-faq-top a:hover, .section-faq-top a:active, .section-faq-top a.active{
+    background: #595959;
+    color: #FFFFFF;
+}
+
+.accordion-row-1{
+    color: #385723;
+    background: #D9F3E4;
+}
+
+.accordion-row-1 h3{
+    color: #385723;
+}
+
+.accordion-row-2{
+    color: #203864;
+    background: #E6EAEF;
+}
+
+.accordion-row-2 h3{
+    color: #203864;
+}
+
+.accordion-row-3{
+    color: #663300;
+    background: #FFFBEF;
+}
+
+.accordion-row-3 h3{
+    color: #663300;
+}
+
+.accordion-row-4{
+    color: #404040;
+    background: #F3F3F3;
+}
+
+.accordion-row-4 h3{
+    color: #404040;
+}
+
+.accordion-row-5{
+    color: #404040;
+    background: #EDF5E8;
+}
+
+.accordion-row-5 h3{
+    color: #404040;
+}
