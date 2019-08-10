@@ -19,6 +19,8 @@ body {
   --enum-name-color: #411FA2;
   --enum-value-color: #7446AB;
   --type-color: #c7caeb;
+  --page-heading-color: #3d3d3d;
+  --text-color: #000000;
 }
 
 
@@ -38,6 +40,8 @@ body {
     --enum-name-color: #ffd064;
     --enum-value-color: #c7caeb;
     --type-color: #c7caeb;
+    --page-heading-color: #f0f0f0;
+    --text-color: #fff;
   }
 
 }
@@ -96,6 +100,14 @@ pre {
 
 .enum-value {
     color: var(--enum-value-color);
+}
+
+.pageHeading {
+  color: var(--page-heading-color)
+}
+
+.pageText {
+  color: var(--text-color)
 }
 
 a {
