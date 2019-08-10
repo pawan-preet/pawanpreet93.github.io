@@ -12,7 +12,7 @@ body {
   --braces-color: black;
   --var-highlight-color: #A23797;
   --let-highlight-color: #A23797;
-
+  --separator-color: #d1d1d1;
   --string-highlight-color: #CA2B20;
   --comments-highlight-color: #2A791C;
   --function-highlight-color: #7446AB;
@@ -31,6 +31,7 @@ body {
 
   :root {
     --variable-name-color: white;
+    --separator-color: #ffffffea;
     --braces-color: white;
     --var-highlight-color: #ed5494;
     --let-highlight-color: #ed5494;
@@ -108,6 +109,10 @@ pre {
 
 .pageText {
   color: var(--text-color)
+}
+
+.separator {
+  background-color: var(--separator-color);
 }
 
 a {
