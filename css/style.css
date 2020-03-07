@@ -115,9 +115,9 @@ pre {
   background-color: var(--separator-color);
 }
 
-a {
+/* a {
   text-decoration: none;
-}
+} */
 
 a:hover {
   text-decoration: none;
