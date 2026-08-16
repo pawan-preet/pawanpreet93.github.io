@@ -1,0 +1,493 @@
+<style>
+/* ── Flaps (Dayly) — the split-flap health board.
+   Palette + geometry lifted from the app, not eyeballed:
+     Shared/FlapTheme.swift  · theme "departure": background #0E1C42, tile #21418F,
+                               text #EEF3FF, seam black .55; tileTop = tile lightened .06
+                               (#2E4C96), tileBottom = tile darkened .12 (#1D397E)
+     Shared/DaylyTokens.swift· boardModuleCount 12, characterAspect .72, cornerRadiusRatio .09,
+                               fontRatio .58, characterSpacing 2, seamHeight 1,
+                               flip .18s / foldPortion .62 / stagger .04, fold shade 0 → .35
+     Recap/MetricTileCell.swift · caption mono 12 semibold, caption→flap gap 10, row top 12,
+                               row height = moduleHeight + 66, separator .5pt white .12
+     Recap/RecapViewController.swift · section insets 24, header 48, logo = 5 modules @ 22pt
+   Everything is driven by --p (0→1). The board clatters in row by row: each module
+   folds its dimmed placeholder dash away, folds a blank, then lands the character. */
+
+.c-flaps{
+  --_p: var(--p, 1);
+
+  /* board palette — FlapTheme "Departure" */
+  --bd:  #0E1C42;
+  --tt:  #2E4C96;
+  --tb:  #1D397E;
+  --tx:  #EEF3FF;
+  --txd: rgba(238,243,255,.35);
+  --sm:  rgba(0,0,0,.55);
+  --sep-c: rgba(255,255,255,.12);
+  --cap-c: var(--ink-2, rgba(235,235,245,.6));
+
+  --sans-f: var(--sans, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif);
+  --mono-f: var(--mono, "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
+
+  /* board width lives here so the glow behind it can match without measuring */
+  --bw: min(100%, max(11.5rem, 27svh));
+
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 34rem;
+  margin: 0 auto;
+  box-sizing: border-box;
+  font-family: var(--sans-f);
+  color: var(--ink, #fff);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.c-flaps *{ box-sizing: border-box; }
+.c-flaps p{ margin: 0; }
+
+/* the panel's own colour bleeding onto the black canvas.
+   It hangs off .c-flaps, not off .board: .board carries container-type, which
+   applies layout containment and therefore opens its own stacking context —
+   a z-index:-1 child of it would paint *over* the board's fill instead of under
+   it. Width is capped at 100% so the glow can never widen the component. */
+.c-flaps::before{
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -14%;
+  left: 50%;
+  width: min(100%, calc(var(--bw) * 1.2));
+  height: 128%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(closest-side ellipse,
+      color-mix(in srgb, var(--accent, #1B2A6B) 55%, transparent),
+      transparent 72%);
+  opacity: calc(clamp(0, calc(var(--_p) * 6), 1) * .55);
+  pointer-events: none;
+}
+
+/* ── the board: a phone-proportioned panel, height-budgeted against the stage */
+.c-flaps .board{
+  position: relative;
+  width: var(--bw);
+  container-type: inline-size;
+  background: var(--bd);
+  border-radius: 1.5rem;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.06),
+    0 1.4rem 3.4rem rgba(0,0,0,.55);
+  opacity: clamp(0, calc(var(--_p) * 14), 1);
+  transform: translateY(calc((1 - clamp(0, calc(var(--_p) * 9), 1)) * .9rem));
+}
+/* one place for every derived metric; 100cqw resolves against .board */
+.c-flaps .inner{
+  --pad: 6.1cqw;                                              /* 24pt of 393 */
+  --gap: .52cqw;                                              /* characterSpacing 2 */
+  --tw: calc((100cqw - 2 * var(--pad) - 11 * var(--gap)) / 12);
+  --th: calc(var(--tw) / .72);                                /* characterAspect */
+  --r:  calc(var(--th) * .09);                                /* cornerRadiusRatio */
+  --fs: calc(var(--th) * .58);                                /* fontRatio */
+  padding: 3.6cqw 0 3.8cqw;
+}
+
+/* ── nav: the logo is itself a tiny flap board, share on the right ───────── */
+.c-flaps .nav{
+  position: relative;
+  height: 11.2cqw;                                            /* 44pt */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--pad);
+}
+.c-flaps .logo{
+  --th: max(1rem, 5.6cqw);                                    /* logoHeight 22pt */
+  --tw: calc(var(--th) * .72);
+  --r:  calc(var(--th) * .09);
+  --fs: calc(var(--th) * .58);
+  --b: 0; --rs: 0; --cs: .016; --sp: .16; --n: 0;
+  display: flex;
+  gap: var(--gap);
+}
+.c-flaps .logo .m{ flex: 0 0 auto; width: var(--tw); }
+
+.c-flaps .share{
+  position: absolute;
+  right: var(--pad);
+  top: 50%;
+  width: 8.7cqw;
+  height: 8.7cqw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,.10);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.14);
+  --sh: clamp(0, calc((var(--_p) - .05) / .1), 1);
+  opacity: var(--sh);
+  transform: translateY(-50%) scale(calc(.82 + .18 * var(--sh)));
+}
+.c-flaps .share svg{
+  width: 56%;
+  height: 56%;
+  display: block;
+  fill: none;
+  stroke: rgba(255,255,255,.92);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ── the date line ───────────────────────────────────────────────────────── */
+.c-flaps .date{
+  height: 12.2cqw;                                            /* header 48pt */
+  display: flex;
+  align-items: center;
+  padding: 0 var(--pad);
+  font-family: var(--mono-f);
+  font-weight: 600;
+  font-size: max(.72rem, 3.56cqw);                            /* mono 14 semibold */
+  letter-spacing: .01em;
+  color: var(--ink, #fff);
+  --dt: clamp(0, calc((var(--_p) - .03) / .1), 1);
+  opacity: var(--dt);
+  transform: translateY(calc((1 - var(--dt)) * .45em));
+}
+
+/* ── metric rows ─────────────────────────────────────────────────────────── */
+.c-flaps .rows{
+  padding: 0 var(--pad);
+  --b: .07; --rs: .082; --cs: .0115; --sp: .2;
+}
+.c-flaps .row{ position: relative; padding-top: 3.05cqw; }    /* 12pt */
+.c-flaps .cap{
+  font-family: var(--mono-f);
+  font-weight: 600;
+  font-size: max(.56rem, 3.05cqw);                            /* mono 12 semibold */
+  line-height: 1.15;
+  letter-spacing: .05em;
+  color: var(--cap-c);
+  --ct: clamp(0, calc((var(--_p) - .01 - var(--n) * .012) / .06), 1);
+  opacity: var(--ct);
+  transform: translateY(calc((1 - var(--ct)) * .4em));
+}
+.c-flaps .tiles{
+  margin-top: 2.54cqw;                                        /* caption → flap 10pt */
+  display: grid;
+  /* minmax(0,…) rather than 1fr: a grid item's automatic minimum size is its content,
+     so the twelve modules refuse to shrink below their glyph and blow the board out
+     to the right. Zero lets them divide the row honestly. */
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--gap);
+  /* A grid item is stretched in the block axis by default, and a stretched item
+     ignores its aspect-ratio — the row then sizes from content, which is zero here
+     because every leaf is absolutely positioned, and the whole board collapses.
+     Sizing from the start lets aspect-ratio give each module its height. */
+  align-items: start;
+}
+.c-flaps .sep{
+  margin-top: 6.9cqw;                                         /* row height = module + 66pt */
+  height: 1px;
+  background: var(--sep-c);
+  transform-origin: left center;
+  transform: scaleX(clamp(0, calc((var(--_p) - .01 - var(--n) * .012) / .1), 1));
+}
+.c-flaps .row:last-child .sep{ background: transparent; }
+
+/* ── one flap module ─────────────────────────────────────────────────────── */
+.c-flaps .m{
+  position: relative;
+  aspect-ratio: 18 / 25;                                      /* characterAspect .72 */
+  /* Every leaf inside is absolutely positioned, so the module has no in-flow content
+     to size from. --th is the module height the design already derives from the board
+     width, so state it outright rather than leaning on aspect-ratio alone. */
+  height: var(--th);
+  border-radius: var(--r);
+  perspective: calc(var(--th) * 8);                           /* m34 = -1/(h*8) */
+  box-shadow: 0 1px 1.5px rgba(0,0,0,.35);                    /* the module's drop shadow */
+  background:
+    linear-gradient(var(--tt) 0 calc(50% - .6px),
+                    var(--sm) calc(50% - .6px) calc(50% + .6px),
+                    var(--tb) calc(50% + .6px) 100%);
+}
+.c-flaps .m i{
+  position: absolute;
+  left: 0; right: 0;
+  height: 50%;
+  overflow: hidden;
+  backface-visibility: hidden;
+}
+.c-flaps .m i::before{
+  content: attr(data-c);
+  position: absolute;
+  left: 0; right: 0;
+  height: 200%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono-f);
+  font-style: normal;
+  font-weight: 600;
+  font-size: var(--fs);
+  line-height: 1;
+  color: var(--tx);
+  text-shadow: 0 1px 0 rgba(0,0,0,.4);
+  transform: translateY(.05em);                               /* seam through the glyph's waist */
+}
+/* the placeholder dash rides the seam rather than the digits' waist */
+.c-flaps .m .dim::before{ color: var(--txd); transform: translateY(-.02em); }
+
+/* top halves: the resting face and the two folding leaves */
+.c-flaps .ht,
+.c-flaps .lf{
+  top: 0;
+  background: var(--tt);
+  border-radius: var(--r) var(--r) 0 0;
+  box-shadow: inset 0 -1px 0 var(--sm);
+  transform-origin: bottom center;
+}
+.c-flaps .ht::before,
+.c-flaps .lf::before{ top: 0; }
+
+/* bottom halves: the resting face and the landing leaf */
+.c-flaps .hb,
+.c-flaps .bl{
+  top: 50%;
+  background: var(--tb);
+  border-radius: 0 0 var(--r) var(--r);
+  box-shadow: inset 0 1px 0 var(--sm);
+  transform-origin: top center;
+}
+.c-flaps .hb::before,
+.c-flaps .bl::before{ bottom: 0; }
+
+.c-flaps .ht, .c-flaps .hb{ z-index: 0; }
+.c-flaps .bl{ z-index: 2; }
+.c-flaps .f2{ z-index: 3; }
+.c-flaps .f1{ z-index: 4; }
+
+/* the shade that darkens a face while it rotates (animateShade 0 → .35) */
+.c-flaps .lf::after,
+.c-flaps .bl::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+}
+
+/* ── the flip, entirely from --p ─────────────────────────────────────────── */
+.c-flaps .f{
+  --d: calc(var(--b) + var(--n) * var(--rs) + var(--i) * var(--cs));
+  --t: clamp(0, calc((var(--_p) - var(--d)) / var(--sp)), 1);
+
+  --a:  clamp(0, calc(var(--t) / .34), 1);                    /* leaf 1 folds  */
+  --ae: calc(var(--a) * var(--a));                            /*   ease-in     */
+  --c2: clamp(0, calc((var(--t) - .34) / .28), 1);            /* leaf 2 folds  */
+  --ce: calc(var(--c2) * var(--c2));
+  --l:  clamp(0, calc((var(--t) - .62) / .26), 1);            /* the landing   */
+  --li: calc(1 - var(--l));
+  --le: calc(1 - var(--li) * var(--li));                      /*   ease-out    */
+  --s:  clamp(0, calc((var(--t) - .88) / .12), 1);            /* the settle    */
+}
+.c-flaps .f .f1{ transform: rotateX(calc(var(--ae) * -90deg)); }
+.c-flaps .f .f1::after{ opacity: calc(var(--a) * .35); }
+.c-flaps .f .f2{ transform: rotateX(calc(var(--ce) * -90deg)); }
+.c-flaps .f .f2::after{ opacity: calc(var(--c2) * .35); }
+.c-flaps .f .bl{
+  transform: rotateX(calc(90deg - var(--le) * 96deg + var(--s) * 6deg));
+}
+.c-flaps .f .bl::after{ opacity: calc((1 - var(--le)) * .35); }
+/* the outgoing bottom half goes blank under the falling leaf */
+.c-flaps .f .hb{ opacity: calc(1 - clamp(0, calc((var(--t) - .3) / .14), 1)); }
+
+/* real text for anything the modules only draw */
+.c-flaps .sr{
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Reduced motion: pin every --p-derived value to its landed state (board up,
+   leaves folded, characters seated) and refuse any loop the host might have
+   handed down — this component declares none of its own. */
+@media (prefers-reduced-motion: reduce){
+  .c-flaps{ --_p: 1; }
+  .c-flaps,
+  .c-flaps *,
+  .c-flaps *::before,
+  .c-flaps *::after{
+    animation: none !important;
+    transition: none !important;
+  }
+}
+</style>
+<div class="c-flaps">
+  <div class="board">
+    <div class="inner">
+
+      <div class="nav">
+        <div class="logo" aria-hidden="true">
+          <div class="m f" style="--i:0"><i class="ht" data-c="F"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="F"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+          <div class="m f" style="--i:1"><i class="ht" data-c="L"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="L"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+          <div class="m f" style="--i:2"><i class="ht" data-c="A"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="A"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+          <div class="m f" style="--i:3"><i class="ht" data-c="P"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="P"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+          <div class="m f" style="--i:4"><i class="ht" data-c="S"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="S"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+        </div>
+        <p class="sr">Flaps</p>
+        <div class="share" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M7.4 10.6H6.2a1.6 1.6 0 0 0-1.6 1.6v6.4a1.6 1.6 0 0 0 1.6 1.6h11.6a1.6 1.6 0 0 0 1.6-1.6v-6.4a1.6 1.6 0 0 0-1.6-1.6h-1.2"/>
+            <path d="M12 14.6V3.9"/>
+            <path d="M8.5 7.4 12 3.9l3.5 3.5"/>
+          </svg>
+        </div>
+      </div>
+
+      <p class="date">TODAY</p>
+
+      <div class="rows">
+      <div class="row" style="--n:0">
+        <p class="cap">STEPS</p>
+        <div class="tiles" aria-hidden="true">
+            <div class="m f" style="--i:0"><i class="ht" data-c="4"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="4"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:1"><i class="ht" data-c=","></i><i class="hb dim" data-c="-"></i><i class="bl" data-c=","></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:2"><i class="ht" data-c="8"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="8"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:3"><i class="ht" data-c="0"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="0"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:4"><i class="ht" data-c="9"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="9"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m" style="--i:5"></div>
+            <div class="m" style="--i:6"></div>
+            <div class="m" style="--i:7"></div>
+            <div class="m" style="--i:8"></div>
+            <div class="m" style="--i:9"></div>
+            <div class="m" style="--i:10"></div>
+            <div class="m" style="--i:11"></div>
+        </div>
+        <p class="sr">4,809</p>
+        <div class="sep" aria-hidden="true"></div>
+      </div>
+      <div class="row" style="--n:1">
+        <p class="cap">AVG HR</p>
+        <div class="tiles" aria-hidden="true">
+            <div class="m f" style="--i:0"><i class="ht" data-c="8"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="8"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:1"><i class="ht" data-c="2"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="2"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m" style="--i:2"></div>
+            <div class="m f" style="--i:3"><i class="ht" data-c="B"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="B"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:4"><i class="ht" data-c="P"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="P"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:5"><i class="ht" data-c="M"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="M"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m" style="--i:6"></div>
+            <div class="m" style="--i:7"></div>
+            <div class="m" style="--i:8"></div>
+            <div class="m" style="--i:9"></div>
+            <div class="m" style="--i:10"></div>
+            <div class="m" style="--i:11"></div>
+        </div>
+        <p class="sr">82 BPM</p>
+        <div class="sep" aria-hidden="true"></div>
+      </div>
+      <div class="row" style="--n:2">
+        <p class="cap">RESTING HR</p>
+        <div class="tiles" aria-hidden="true">
+            <div class="m f" style="--i:0"><i class="ht" data-c="7"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="7"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:1"><i class="ht" data-c="6"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="6"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m" style="--i:2"></div>
+            <div class="m f" style="--i:3"><i class="ht" data-c="B"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="B"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:4"><i class="ht" data-c="P"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="P"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:5"><i class="ht" data-c="M"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="M"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m" style="--i:6"></div>
+            <div class="m" style="--i:7"></div>
+            <div class="m" style="--i:8"></div>
+            <div class="m" style="--i:9"></div>
+            <div class="m" style="--i:10"></div>
+            <div class="m" style="--i:11"></div>
+        </div>
+        <p class="sr">76 BPM</p>
+        <div class="sep" aria-hidden="true"></div>
+      </div>
+      <div class="row" style="--n:3">
+        <p class="cap">ACTIVE ENERGY</p>
+        <div class="tiles" aria-hidden="true">
+            <div class="m f" style="--i:0"><i class="ht" data-c="3"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="3"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:1"><i class="ht" data-c="4"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="4"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:2"><i class="ht" data-c="6"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="6"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m" style="--i:3"></div>
+            <div class="m f" style="--i:4"><i class="ht" data-c="K"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="K"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:5"><i class="ht" data-c="C"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="C"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:6"><i class="ht" data-c="A"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="A"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:7"><i class="ht" data-c="L"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="L"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m" style="--i:8"></div>
+            <div class="m" style="--i:9"></div>
+            <div class="m" style="--i:10"></div>
+            <div class="m" style="--i:11"></div>
+        </div>
+        <p class="sr">346 KCAL</p>
+        <div class="sep" aria-hidden="true"></div>
+      </div>
+      <div class="row" style="--n:4">
+        <p class="cap">EXERCISE</p>
+        <div class="tiles" aria-hidden="true">
+            <div class="m f" style="--i:0"><i class="ht" data-c="1"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="1"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m" style="--i:1"></div>
+            <div class="m f" style="--i:2"><i class="ht" data-c="M"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="M"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:3"><i class="ht" data-c="I"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="I"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:4"><i class="ht" data-c="N"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="N"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m" style="--i:5"></div>
+            <div class="m" style="--i:6"></div>
+            <div class="m" style="--i:7"></div>
+            <div class="m" style="--i:8"></div>
+            <div class="m" style="--i:9"></div>
+            <div class="m" style="--i:10"></div>
+            <div class="m" style="--i:11"></div>
+        </div>
+        <p class="sr">1 MIN</p>
+        <div class="sep" aria-hidden="true"></div>
+      </div>
+      <div class="row" style="--n:5">
+        <p class="cap">SLEEP</p>
+        <div class="tiles" aria-hidden="true">
+            <div class="m f" style="--i:0"><i class="ht" data-c="6"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="6"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:1"><i class="ht" data-c="H"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="H"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:2"><i class="ht" data-c="R"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="R"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m" style="--i:3"></div>
+            <div class="m f" style="--i:4"><i class="ht" data-c="5"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="5"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:5"><i class="ht" data-c="8"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="8"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:6"><i class="ht" data-c="M"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="M"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:7"><i class="ht" data-c="I"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="I"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:8"><i class="ht" data-c="N"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="N"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m" style="--i:9"></div>
+            <div class="m" style="--i:10"></div>
+            <div class="m" style="--i:11"></div>
+        </div>
+        <p class="sr">6HR 58MIN</p>
+        <div class="sep" aria-hidden="true"></div>
+      </div>
+      <div class="row" style="--n:6">
+        <p class="cap">HRV</p>
+        <div class="tiles" aria-hidden="true">
+            <div class="m f" style="--i:0"><i class="ht" data-c="4"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="4"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:1"><i class="ht" data-c="7"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="7"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m" style="--i:2"></div>
+            <div class="m f" style="--i:3"><i class="ht" data-c="M"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="M"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m f" style="--i:4"><i class="ht" data-c="S"></i><i class="hb dim" data-c="-"></i><i class="bl" data-c="S"></i><i class="lf f2" data-c=" "></i><i class="lf f1 dim" data-c="-"></i></div>
+            <div class="m" style="--i:5"></div>
+            <div class="m" style="--i:6"></div>
+            <div class="m" style="--i:7"></div>
+            <div class="m" style="--i:8"></div>
+            <div class="m" style="--i:9"></div>
+            <div class="m" style="--i:10"></div>
+            <div class="m" style="--i:11"></div>
+        </div>
+        <p class="sr">47 MS</p>
+        <div class="sep" aria-hidden="true"></div>
+      </div>
+      </div>
+
+    </div>
+  </div>
+</div>

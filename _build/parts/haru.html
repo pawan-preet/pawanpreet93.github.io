@@ -1,0 +1,572 @@
+<style>
+/* ─────────────────────────────────────────────────────────────
+   Haru — the Player (routine runner), "Pebble Night"
+   Values taken from Haru/DESIGN_SYSTEM.md, HaruPalette.swift,
+   HaruSpace.swift, HaruType.swift, PebblePath.swift,
+   HaruButtonStyles.swift and Haru/Player/PlayerView.swift.
+   Everything is laid out in the app's own points, scaled by --u.
+   ───────────────────────────────────────────────────────────── */
+
+.c-haru {
+  /* progress alias so the component still renders if --p is absent */
+  --pp: var(--p, 0);
+
+  /* Pebble Night palette (HaruPalette.swift, dark values) */
+  --h-ink: #F4EEE2;
+  --h-muted: #9A9284;
+  --h-surface: #1D1A14;
+  --h-track: rgba(244, 238, 226, .10);
+  --h-hairline: rgba(244, 238, 226, .14);
+  --h-tint: var(--accent, #D9A24B);
+
+  /* one point of the app's layout, in CSS pixels.
+     393u is the screen width, so the width term is exactly 100cqw — never a
+     hair more, or the panel would push a scrollbar out of a 360px viewport. */
+  --u: min(calc(100cqw / 393), 0.1157svh);
+
+  container-type: inline-size;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 34rem;
+  margin-inline: auto;
+  font-family: var(--sans, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif);
+  -webkit-font-smoothing: antialiased;
+}
+
+.c-haru *,
+.c-haru *::before,
+.c-haru *::after { box-sizing: border-box; }
+
+.c-haru p { margin: 0; }
+
+.c-haru .h-sr {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ── the screen ────────────────────────────────────────────── */
+
+.c-haru .h-screen {
+  position: relative;
+  width: calc(393 * var(--u));
+  height: calc(536 * var(--u));
+  padding: calc(16 * var(--u)) 0 calc(24 * var(--u));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  isolation: isolate;
+  color: var(--h-ink);
+}
+
+/* warm charcoal, never pure black — feathered so it melts into the canvas */
+.c-haru .h-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(54% 40% at 50% 37%,
+      color-mix(in srgb, var(--h-tint) 15%, transparent) 0%, transparent 68%),
+    radial-gradient(80% 56% at 50% 50%,
+      #1d1a14 0%, #16130c 38%, rgba(6, 5, 4, 0) 88%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 20%, #000 80%, transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0, #000 20%, #000 80%, transparent 100%);
+}
+
+/* ── entrance: each band settles as the panel arrives ──────── */
+
+.c-haru .h-band {
+  --e: clamp(0, calc((var(--pp) - var(--n) * 0.006) * 45), 1);
+  opacity: var(--e);
+  transform: translateY(calc((1 - var(--e)) * 9 * var(--u)));
+}
+
+.c-haru .h-sp { flex: 1 1 auto; }
+.c-haru .h-sp-1 { min-height: calc(16 * var(--u)); }
+.c-haru .h-sp-2 { min-height: calc(16 * var(--u)); }
+.c-haru .h-sp-3 { min-height: calc(24 * var(--u)); }
+
+/* ── top bar (PlayerView.topBar) ───────────────────────────── */
+
+.c-haru .h-top {
+  flex: 0 0 auto;
+  height: calc(40 * var(--u));
+  padding-inline: calc(20 * var(--u));   /* HaruSpace.gutter */
+  display: flex;
+  align-items: center;
+  gap: calc(8 * var(--u));
+}
+
+.c-haru .h-routine {
+  flex: 1 1 auto;
+  text-align: center;
+  color: var(--h-muted);
+  font-size: calc(15 * var(--u));         /* HaruType .label */
+  font-weight: 500;
+  letter-spacing: .012em;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* HaruCircleButtonStyle(diameter: 40) */
+.c-haru .h-circle {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--h-surface);
+  box-shadow: inset 0 0 0 calc(1 * var(--u)) var(--h-hairline);
+  color: var(--h-ink);
+}
+.c-haru .h-close  { width: calc(40 * var(--u)); height: calc(40 * var(--u)); }
+.c-haru .h-ghost  { width: calc(40 * var(--u)); height: calc(40 * var(--u)); }
+
+/* ── the task carousel (PlayerView.taskCarousel) ───────────── */
+
+.c-haru .h-hero {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: calc(8 * var(--u));                /* HaruSpace.s */
+}
+
+.c-haru .h-carousel {
+  height: calc(132 * var(--u));
+  position: relative;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 13%, #000 87%, transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0, #000 13%, #000 87%, transparent 100%);
+}
+
+.c-haru .h-track {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: calc(12 * var(--u));               /* HaruSpace.m */
+  width: max-content;
+  /* offset = (width − itemWidth)/2 − index × step; itemWidth = .68 × 393 */
+  transform: translateX(calc((63 - var(--idx) * 279) * var(--u)));
+}
+
+/* Every card is laid out once at the focused size and scaled down when it is
+   off-centre, so the label never re-wraps and no frame costs a layout pass.
+   .63 × 54 = 34 (icon) and .63 × 24 = 15 (.label), the app's two sizes. */
+.c-haru .h-task {
+  --c: clamp(0, calc(1 - max(var(--idx) - var(--n), var(--n) - var(--idx))), 1);
+  width: calc(267 * var(--u));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(8 * var(--u));
+  opacity: calc(.22 + .78 * var(--c));
+  transform: scale(calc(.63 + .37 * var(--c)));
+  transform-origin: 50% 50%;
+}
+
+.c-haru .h-task svg {
+  width: calc(54 * var(--u));
+  height: calc(54 * var(--u));
+}
+
+.c-haru .h-task p {
+  font-size: calc(24 * var(--u));         /* .title, scaled down to .label */
+  font-weight: 600;
+  letter-spacing: .004em;
+  line-height: 1.18;
+  text-align: center;
+  color: var(--h-ink);
+}
+
+/* ── the countdown (HaruDigits, role .timerHero) ───────────── */
+
+.c-haru .h-count {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(76 * var(--u));
+  line-height: 1;
+  font-weight: 600;
+  color: var(--h-tint);
+  letter-spacing: 0;
+}
+
+/* every digit sits in a cell as wide as the widest numeral */
+.c-haru .h-d {
+  position: relative;
+  display: block;
+  width: .60em;
+  height: 1.08em;
+  overflow: hidden;
+}
+
+.c-haru .h-col {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1000%;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(calc(var(--d) * -10%));
+  transition: transform .13s linear;      /* time is never sprung */
+}
+
+.c-haru .h-col span {
+  height: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.c-haru .h-sep {
+  display: block;
+  width: .26em;
+  text-align: center;
+  transform: translateY(-.06em);
+}
+
+/* ── the Pebble Path, hero style ───────────────────────────── */
+
+.c-haru .h-pathblock {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: calc(12 * var(--u));               /* HaruSpace.m */
+  padding-inline: calc(20 * var(--u));
+}
+
+.c-haru .h-path {
+  display: flex;
+  align-items: center;
+  gap: calc(7 * var(--u));                /* hero gap */
+  height: calc(26 * var(--u));            /* hero height */
+}
+
+.c-haru .h-pebble {
+  --c: clamp(0, calc(1 - max(var(--idx) - var(--n), var(--n) - var(--idx))), 1);
+  flex: calc(1 + 1.5 * var(--c)) 1 0;     /* current stone is 2.5× */
+  height: 100%;
+  border-radius: 999px;
+  background: var(--h-track);
+  overflow: hidden;
+}
+
+/* a rectangle clipped to the capsule — a level rising, not a stone inside a stone */
+.c-haru .h-pebble i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--h-tint);
+  transform-origin: left center;
+  transform: scaleX(var(--f));
+}
+
+/* ── counter and promise ───────────────────────────────────── */
+
+.c-haru .h-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(2 * var(--u));                /* HaruSpace.xxs */
+}
+
+.c-haru .h-counter {
+  display: grid;
+  font-size: calc(12 * var(--u));          /* .meta */
+  font-weight: 500;
+  letter-spacing: .02em;
+  line-height: 1.3;
+  color: var(--h-muted);
+}
+
+.c-haru .h-counter span {
+  --c: clamp(0, calc(1 - max(var(--idx) - var(--n), var(--n) - var(--idx))), 1);
+  grid-area: 1 / 1;
+  text-align: center;
+  opacity: var(--c);
+}
+
+.c-haru .h-promise {
+  font-size: calc(15 * var(--u));          /* .label */
+  font-weight: 500;
+  letter-spacing: .01em;
+  line-height: 1.25;
+  color: var(--h-ink);
+}
+
+/* ── controls (PlayerView.controls) ────────────────────────── */
+
+.c-haru .h-controls {
+  flex: 0 0 auto;
+  height: calc(76 * var(--u));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(16 * var(--u));                /* HaruSpace.l */
+}
+
+.c-haru .h-ctl {
+  width: calc(52 * var(--u));
+  height: calc(52 * var(--u));
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--h-surface);
+  box-shadow: inset 0 0 0 calc(1 * var(--u)) var(--h-hairline);
+  color: var(--h-ink);
+}
+
+.c-haru .h-ctl-main {
+  position: relative;
+  width: calc(76 * var(--u));
+  height: calc(76 * var(--u));
+  background: var(--h-tint);
+  box-shadow: none;
+  color: #fff;
+  animation: haru-breath 4.2s ease-in-out infinite;
+}
+
+/* ambient, secondary: the button you came to press, breathing */
+.c-haru .h-ctl-main::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--h-tint);
+  z-index: -1;
+  animation: haru-halo 4.2s ease-in-out infinite;
+}
+
+@keyframes haru-breath {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.018); }
+}
+
+@keyframes haru-halo {
+  0%, 100% { transform: scale(1);    opacity: 0; }
+  50%      { transform: scale(1.24); opacity: .16; }
+}
+
+/* ── glyphs ────────────────────────────────────────────────── */
+
+.c-haru svg {
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  overflow: visible;
+}
+.c-haru svg .fill { fill: currentColor; stroke: none; }
+.c-haru svg text {
+  font-family: var(--sans, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif);
+  font-weight: 600;
+  fill: currentColor;
+  stroke: none;
+}
+
+.c-haru .h-close svg { width: calc(26 * var(--u)); height: calc(26 * var(--u)); }
+.c-haru .h-ctl  svg  { width: calc(22 * var(--u)); height: calc(22 * var(--u)); }
+.c-haru .h-ctl-main svg { width: calc(32 * var(--u)); height: calc(32 * var(--u)); }
+
+/* ── the run itself, entirely a function of --p ────────────── */
+
+.c-haru .h-screen {
+  /* step progress: Water 30s · Open the curtains 30s · Wash your face 60s */
+  --t1: clamp(0, calc((var(--pp) - 0.05) * 3.70), 1);
+  --t2: clamp(0, calc((var(--pp) - 0.36) * 4.17), 1);
+  --t3: clamp(0, calc((var(--pp) - 0.64) * 3.85), 1);
+
+  /* hard hand-offs, so the clock never blends between two steps */
+  --a1: clamp(0, calc((var(--pp) - 0.330) * 100), 1);
+  --a2: clamp(0, calc((var(--pp) - 0.610) * 100), 1);
+  --a3: clamp(0, calc((var(--pp) - 0.915) * 100), 1);
+
+  /* carousel index, eased the way HaruMotion.navigation eases */
+  --i1: clamp(0, calc((var(--pp) - 0.325) * 40), 1);
+  --i2: clamp(0, calc((var(--pp) - 0.605) * 40), 1);
+  --i3: clamp(0, calc((var(--pp) - 0.920) * 25), 1);
+  --s1: calc(var(--i1) * var(--i1) * (3 - 2 * var(--i1)));
+  --s2: calc(var(--i2) * var(--i2) * (3 - 2 * var(--i2)));
+  --s3: calc(var(--i3) * var(--i3) * (3 - 2 * var(--i3)));
+  --idx: calc(var(--s1) + var(--s2) + var(--s3));
+
+  /* seconds left on the current step, truncated — never a second it hasn't reached */
+  --raw: calc(
+      30 * (1 - var(--t1)) * (1 - var(--a1))
+    + 30 * (1 - var(--t2)) * (var(--a1) - var(--a2))
+    + 60 * (1 - var(--t3)) * (var(--a2) - var(--a3))
+    + 120 * var(--a3)
+  );
+  --sec:  calc(round(down, var(--raw), 1));
+  --mm:   calc(round(down, var(--sec) / 60, 1));
+  --rr:   calc(var(--sec) - var(--mm) * 60);
+  --tens: calc(round(down, var(--rr) / 10, 1));
+  --ones: calc(var(--rr) - var(--tens) * 10);
+}
+
+/* ── reduced motion: pinned to the finished state ──────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .c-haru { --pp: 1; }
+  .c-haru .h-col { transition: none; }
+  .c-haru .h-ctl-main,
+  .c-haru .h-ctl-main::after { animation: none; }
+  .c-haru .h-ctl-main::after { opacity: 0; }
+}
+</style>
+
+<div class="c-haru">
+  <div class="h-screen">
+
+    <!-- top bar -->
+    <div class="h-top h-band" style="--n:0">
+      <div class="h-circle h-close" aria-hidden="true">
+        <svg viewBox="0 0 24 24" stroke-width="1.6"><path d="M6.4 6.4 18 18M18 6.4 6.4 18"/></svg>
+      </div>
+      <p class="h-routine">Morning Reset</p>
+      <div class="h-ghost" aria-hidden="true"></div>
+    </div>
+
+    <div class="h-sp h-sp-1" aria-hidden="true"></div>
+
+    <!-- task carousel + countdown: one thought -->
+    <div class="h-hero h-band" style="--n:1">
+      <div class="h-carousel">
+        <div class="h-track">
+
+          <div class="h-task" style="--n:0">
+            <svg viewBox="0 0 24 24" stroke-width="1.4" aria-hidden="true">
+              <path d="M12 3.4C12 3.4 5.6 11.1 5.6 15.1a6.4 6.4 0 0 0 12.8 0C18.4 11.1 12 3.4 12 3.4Z"/>
+            </svg>
+            <p>Water</p>
+          </div>
+
+          <div class="h-task" style="--n:1">
+            <svg viewBox="0 0 24 24" stroke-width="1.4" aria-hidden="true">
+              <circle cx="12" cy="12" r="4.3"/>
+              <path d="M12 1.8v2.8M12 19.4v2.8M1.8 12h2.8M19.4 12h2.8M6.91 6.91 4.79 4.79M17.09 6.91l2.12-2.12M6.91 17.09l-2.12 2.12M17.09 17.09l2.12 2.12"/>
+            </svg>
+            <p>Open the curtains</p>
+          </div>
+
+          <div class="h-task" style="--n:2">
+            <!-- basin and two drops — not the plain droplet, which is "Water" -->
+            <svg viewBox="0 0 24 24" stroke-width="1.4" aria-hidden="true">
+              <path d="M3.6 12.9h16.8a8.4 8.4 0 0 1-16.8 0Z"/>
+              <path d="M10 3.4C10 3.4 8.5 5.2 8.5 6.15a1.5 1.5 0 0 0 3 0C11.5 5.2 10 3.4 10 3.4Z"/>
+              <path d="M14.6 6.3C14.6 6.3 13.45 7.7 13.45 8.4a1.15 1.15 0 0 0 2.3 0C15.75 7.7 14.6 6.3 14.6 6.3Z"/>
+            </svg>
+            <p>Wash your face</p>
+          </div>
+
+          <div class="h-task" style="--n:3">
+            <svg viewBox="0 0 24 24" stroke-width="1.4" aria-hidden="true">
+              <circle cx="13.9" cy="3.9" r="2"/>
+              <path d="M13.3 6.3c-.6 2.9-2.1 4.9-4.2 6"/>
+              <path d="M12.1 9.7 10.4 16.1"/>
+              <path d="M9.1 12.3 7.5 16.8 5.6 20.5"/>
+              <path d="M9.1 12.3 13.3 15.1 14.4 20.5"/>
+            </svg>
+            <p>Stretch</p>
+          </div>
+
+          <div class="h-task" style="--n:4">
+            <svg viewBox="0 0 24 24" stroke-width="1.4" aria-hidden="true">
+              <circle cx="12" cy="12" r="8.6"/>
+              <circle cx="12" cy="12" r="4.6"/>
+              <circle class="fill" cx="12" cy="12" r="1.3"/>
+            </svg>
+            <p>Name today's one thing</p>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="h-count">
+        <span class="h-sr">30 seconds remaining</span>
+        <span class="h-d" style="--d:var(--mm)" aria-hidden="true">
+          <span class="h-col"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span></span>
+        </span>
+        <span class="h-sep" aria-hidden="true">:</span>
+        <span class="h-d" style="--d:var(--tens)" aria-hidden="true">
+          <span class="h-col"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span></span>
+        </span>
+        <span class="h-d" style="--d:var(--ones)" aria-hidden="true">
+          <span class="h-col"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span></span>
+        </span>
+      </div>
+    </div>
+
+    <div class="h-sp h-sp-2" aria-hidden="true"></div>
+
+    <!-- the Pebble Path, hero style -->
+    <div class="h-pathblock h-band" style="--n:2">
+      <div class="h-path" aria-hidden="true">
+        <div class="h-pebble" style="--n:0; --f:var(--t1)"><i></i></div>
+        <div class="h-pebble" style="--n:1; --f:var(--t2)"><i></i></div>
+        <div class="h-pebble" style="--n:2; --f:var(--t3)"><i></i></div>
+        <div class="h-pebble" style="--n:3; --f:0"><i></i></div>
+        <div class="h-pebble" style="--n:4; --f:0"><i></i></div>
+      </div>
+
+      <div class="h-meta">
+        <p class="h-counter">
+          <span style="--n:0">step 1 of 5</span>
+          <span style="--n:1" aria-hidden="true">step 2 of 5</span>
+          <span style="--n:2" aria-hidden="true">step 3 of 5</span>
+          <span style="--n:3" aria-hidden="true">step 4 of 5</span>
+          <span style="--n:4" aria-hidden="true">step 5 of 5</span>
+        </p>
+        <p class="h-promise">done by 7:06 AM</p>
+      </div>
+    </div>
+
+    <div class="h-sp h-sp-3" aria-hidden="true"></div>
+
+    <!-- controls -->
+    <div class="h-controls h-band" style="--n:3" aria-hidden="true">
+
+      <div class="h-ctl">
+        <svg viewBox="0 0 24 24" stroke-width="1.9">
+          <path d="M9 4.2 4.4 8.8 9 13.4"/>
+          <path d="M4.4 8.8h9.8a4.9 4.9 0 0 1 0 9.8h-2.2"/>
+        </svg>
+      </div>
+
+      <div class="h-ctl">
+        <svg viewBox="0 0 24 24">
+          <path class="fill" d="M5 5.2 15.2 12 5 18.8Z"/>
+          <rect class="fill" x="16.4" y="5" width="2.7" height="14" rx="1.35"/>
+        </svg>
+      </div>
+
+      <div class="h-ctl h-ctl-main">
+        <svg viewBox="0 0 24 24">
+          <rect class="fill" x="6.4" y="4.4" width="3.7" height="15.2" rx="1.5"/>
+          <rect class="fill" x="13.9" y="4.4" width="3.7" height="15.2" rx="1.5"/>
+        </svg>
+      </div>
+
+      <div class="h-ctl">
+        <svg viewBox="0 0 24 24" stroke-width="2.1">
+          <path d="M4.6 12.4 9.6 17.4 19.4 6.4"/>
+        </svg>
+      </div>
+
+      <div class="h-ctl">
+        <svg viewBox="0 0 24 24" stroke-width="1.9">
+          <path d="M13.5 3.5a8.6 8.6 0 1 1-2.9 0"/>
+          <path d="M11 1.1 13.8 3.5 11 5.9"/>
+          <text x="12" y="12.5" font-size="9.4" text-anchor="middle" dominant-baseline="central">60</text>
+        </svg>
+      </div>
+
+    </div>
+
+  </div>
+</div>

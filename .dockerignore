@@ -1,0 +1,6 @@
+_build/
+.git/
+.gitignore
+README.md
+CNAME
+_preview.html

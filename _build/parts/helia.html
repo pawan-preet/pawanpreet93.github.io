@@ -1,0 +1,246 @@
+<style>
+/* ---------- component: Helia — the sun path ----------
+   Helia's Today card: the day drawn as a dotted dome from sunrise to sunset,
+   with the sun riding it. Colours from the app's own sources:
+   sky (dark, day phase) #16233B → #20344F → #294056 → #324B60 (SkyPalette.gradient),
+   sun tint #FFE7A0 / apricot #E6B97D (DS.Colors.sun, dark), section radius 28,
+   section padding 24, row gap 16 (DS.Radius / DS.Spacing).               */
+.c-helia {
+  position: relative;
+  width: 100%;
+  max-width: 34rem;
+  margin-inline: auto;
+  border-radius: min(1.75rem, 7.5vw);
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.07) 0%, rgba(255,255,255,0) 34%),
+    linear-gradient(180deg, #16233B 0%, #20344F 38%, #294056 72%, #324B60 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.16),
+    0 1.6rem 3.4rem rgba(0,0,0,.55);
+  /* The card settles as its panel takes the viewport. */
+  opacity: clamp(0, calc(var(--p, 0) * 9), 1);
+  transform: translateY(calc((1 - clamp(0, calc((var(--p, 0) - .02) * 7), 1)) * .9rem));
+}
+
+/* Its own measuring context, so every size below is a share of the card. */
+.c-helia .h-in {
+  container-type: inline-size;
+  padding: clamp(.95rem, 4.6%, 1.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(.7rem, 3.4cqw, 1rem);
+}
+
+/* ---------- headline: the app's own "sun window today" ---------- */
+.c-helia .h-head { display: flex; flex-direction: column; gap: .2rem; }
+.c-helia .h-label {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: clamp(.6rem, 2.35cqw, .74rem);
+  font-weight: 500;
+  letter-spacing: .123em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  opacity: clamp(0, calc((var(--p, 0) - .02) * 9), 1);
+  transform: translateY(calc((1 - clamp(0, calc((var(--p, 0) - .02) * 9), 1)) * .45rem));
+}
+.c-helia .h-window {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: clamp(.92rem, 3.55cqw, 1.14rem);
+  font-weight: 500;
+  letter-spacing: .01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  opacity: clamp(0, calc((var(--p, 0) - .05) * 9), 1);
+  transform: translateY(calc((1 - clamp(0, calc((var(--p, 0) - .05) * 9), 1)) * .45rem));
+}
+
+/* ---------- the dome ----------
+   A half-ellipse: rx is half the card's inner width, ry a little shorter, so
+   sunrise and sunset land under their own labels (the widget's Dome, which is
+   deliberately elliptical for exactly that reason).                        */
+.c-helia .h-arc {
+  --rx: 50cqw;
+  --ry: 34cqw;
+  /* Where the sun is: 0 at sunrise, 1 at sunset. */
+  --t: clamp(0, calc((var(--p, 0) - .12) * 1.2), 1);
+  --a: calc((1 - var(--t)) * 180deg);
+  --dx: calc(var(--rx) * cos(var(--a)));
+  --dy: calc(-1 * var(--ry) * sin(var(--a)));
+  position: relative;
+  width: 100%;
+  height: var(--ry);
+  margin-top: clamp(.2rem, 1.4cqw, .5rem);
+}
+
+/* The horizon — the line the whole card is measured against. */
+.c-helia .h-horizon {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%, var(--hairline) 10%, var(--hairline) 90%, transparent 100%);
+  transform-origin: 50% 50%;
+  transform: scaleX(clamp(0, calc(var(--p, 0) * 4), 1));
+}
+
+/* The dashed dome, drawn as beads. Each one knows its own place on the day
+   (--f) and its order along it (--n). */
+.c-helia .h-dots { position: absolute; inset: 0; }
+.c-helia .h-dots i {
+  --k: calc(.12 + var(--f) * .8333);                      /* --p at which the sun reaches this bead */
+  --in: clamp(0, calc((var(--p, 0) - var(--n) * .006) * 12), 1);
+  --pass: clamp(0, calc((var(--p, 0) - var(--k)) * 12), 1);
+  --near: clamp(0, calc(1 - max((var(--p, 0) - var(--k)), (var(--k) - var(--p, 0))) * 9), 1);
+  position: absolute;
+  left: var(--x); top: var(--y);
+  width: clamp(.22rem, 1cqw, .34rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #fff;
+  background: color-mix(in srgb, #FFE7A0 calc(var(--near) * 100%), #fff);
+  /* The bead the sun is standing on gets out of the way, so the disc stays a ring. */
+  opacity: calc(var(--in) * (.15 + .37 * var(--pass) + .3 * var(--near))
+                * (1 - clamp(0, calc((var(--near) - .78) * 9), 1)));
+  transform: translate(-50%, -50%)
+             scale(calc(.48 + .5 * var(--in) + .18 * var(--pass) + .45 * var(--near)));
+}
+
+/* ---------- the sun ---------- */
+.c-helia .h-sun {
+  position: absolute; left: 50%; top: 100%;
+  width: 0; height: 0;
+  transform: translate(var(--dx), var(--dy));
+  opacity: clamp(0, calc((var(--p, 0) - .08) * 10), 1);
+}
+.c-helia .h-glow,
+.c-helia .h-ring { position: absolute; left: 0; top: 0; }
+
+/* The warm bleed into the sky behind it. */
+.c-helia .h-glow {
+  width: 24cqw; aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle,
+    color-mix(in srgb, #FFD79A 52%, transparent) 0%,
+    color-mix(in srgb, var(--accent, #C97F22) 40%, transparent) 26%,
+    color-mix(in srgb, var(--accent, #C97F22) 13%, transparent) 48%,
+    transparent 70%);
+  filter: blur(4px);
+  transform: translate(-50%, -50%);
+  animation: helia-breathe 6.5s ease-in-out infinite;
+}
+/* The disc itself: a ring, not a dot — the sun is an outline in Helia. */
+.c-helia .h-ring {
+  width: clamp(.7rem, 3.3cqw, 1.02rem); aspect-ratio: 1;
+  border-radius: 50%;
+  border: max(1.6px, .45cqw) solid color-mix(in srgb, var(--accent, #C97F22) 42%, #FFE7A0);
+  background: radial-gradient(circle,
+    color-mix(in srgb, #FFE7A0 26%, transparent) 0%, transparent 68%);
+  box-shadow:
+    0 0 .55rem color-mix(in srgb, #FFE7A0 55%, transparent),
+    0 0 1.5rem .06rem color-mix(in srgb, var(--accent, #C97F22) 62%, transparent),
+    0 0 3.2rem .4rem color-mix(in srgb, var(--accent, #C97F22) 34%, transparent);
+  transform: translate(-50%, -50%);
+}
+
+@keyframes helia-breathe {
+  0%, 100% { opacity: .92; transform: translate(-50%, -50%) scale(1); }
+  50%      { opacity: 1;   transform: translate(-50%, -50%) scale(1.07); }
+}
+
+/* ---------- sunrise / sunset ---------- */
+.c-helia .h-foot {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: .75rem;
+  margin-top: clamp(.15rem, 1.2cqw, .45rem);
+}
+.c-helia .h-t { display: flex; flex-direction: column; gap: .1rem; min-width: 0; }
+.c-helia .h-t--end { text-align: right; }
+.c-helia .h-t-l {
+  font-family: var(--sans);
+  font-size: clamp(.6rem, 2.3cqw, .72rem);
+  letter-spacing: .01em;
+  color: var(--ink-2);
+}
+.c-helia .h-t-v {
+  font-family: var(--mono);
+  font-size: clamp(.84rem, 3.15cqw, 1.02rem);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.c-helia .h-t:first-child {
+  opacity: clamp(0, calc((var(--p, 0) - .08) * 8), 1);
+  transform: translateY(calc((1 - clamp(0, calc((var(--p, 0) - .08) * 8), 1)) * .4rem));
+}
+.c-helia .h-t--end {
+  opacity: clamp(0, calc((var(--p, 0) - .2) * 8), 1);
+  transform: translateY(calc((1 - clamp(0, calc((var(--p, 0) - .2) * 8), 1)) * .4rem));
+}
+
+/* ---------- reduced motion: the finished frame, held ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .c-helia { --p: 1; }
+  .c-helia .h-glow { animation: none; opacity: .96; transform: translate(-50%, -50%); }
+}
+</style>
+
+<div class="c-helia">
+  <div class="h-in">
+    <div class="h-head">
+      <p class="h-label">Sun window today</p>
+      <p class="h-window">11:20 AM&#8211;1:40 PM</p>
+    </div>
+
+    <div class="h-arc" aria-hidden="true">
+      <span class="h-horizon"></span>
+      <span class="h-dots">
+        <i style="--n:0;--f:0.0000;--x:0.000%;--y:100.000%"></i>
+        <i style="--n:1;--f:0.0357;--x:0.314%;--y:88.804%"></i>
+        <i style="--n:2;--f:0.0714;--x:1.254%;--y:77.748%"></i>
+        <i style="--n:3;--f:0.1071;--x:2.806%;--y:66.972%"></i>
+        <i style="--n:4;--f:0.1429;--x:4.952%;--y:56.612%"></i>
+        <i style="--n:5;--f:0.1786;--x:7.664%;--y:46.797%"></i>
+        <i style="--n:6;--f:0.2143;--x:10.908%;--y:37.651%"></i>
+        <i style="--n:7;--f:0.2500;--x:14.645%;--y:29.289%"></i>
+        <i style="--n:8;--f:0.2857;--x:18.826%;--y:21.817%"></i>
+        <i style="--n:9;--f:0.3214;--x:23.398%;--y:15.328%"></i>
+        <i style="--n:10;--f:0.3571;--x:28.306%;--y:9.903%"></i>
+        <i style="--n:11;--f:0.3929;--x:33.486%;--y:5.612%"></i>
+        <i style="--n:12;--f:0.4286;--x:38.874%;--y:2.507%"></i>
+        <i style="--n:13;--f:0.4643;--x:44.402%;--y:0.629%"></i>
+        <i style="--n:14;--f:0.5000;--x:50.000%;--y:0.000%"></i>
+        <i style="--n:15;--f:0.5357;--x:55.598%;--y:0.629%"></i>
+        <i style="--n:16;--f:0.5714;--x:61.126%;--y:2.507%"></i>
+        <i style="--n:17;--f:0.6071;--x:66.514%;--y:5.612%"></i>
+        <i style="--n:18;--f:0.6429;--x:71.694%;--y:9.903%"></i>
+        <i style="--n:19;--f:0.6786;--x:76.602%;--y:15.328%"></i>
+        <i style="--n:20;--f:0.7143;--x:81.174%;--y:21.817%"></i>
+        <i style="--n:21;--f:0.7500;--x:85.355%;--y:29.289%"></i>
+        <i style="--n:22;--f:0.7857;--x:89.092%;--y:37.651%"></i>
+        <i style="--n:23;--f:0.8214;--x:92.336%;--y:46.797%"></i>
+        <i style="--n:24;--f:0.8571;--x:95.048%;--y:56.612%"></i>
+        <i style="--n:25;--f:0.8929;--x:97.194%;--y:66.972%"></i>
+        <i style="--n:26;--f:0.9286;--x:98.746%;--y:77.748%"></i>
+        <i style="--n:27;--f:0.9643;--x:99.686%;--y:88.804%"></i>
+        <i style="--n:28;--f:1.0000;--x:100.000%;--y:100.000%"></i>
+      </span>
+      <span class="h-sun">
+        <span class="h-glow"></span>
+        <span class="h-ring"></span>
+      </span>
+    </div>
+
+    <div class="h-foot">
+      <div class="h-t">
+        <span class="h-t-l">Sunrise</span>
+        <span class="h-t-v">5:56 AM</span>
+      </div>
+      <div class="h-t h-t--end">
+        <span class="h-t-l">Sunset</span>
+        <span class="h-t-v">6:55 PM</span>
+      </div>
+    </div>
+  </div>
+</div>

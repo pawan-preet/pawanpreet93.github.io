@@ -1,0 +1,556 @@
+<style>
+/* ── Cabin — the home screen (Cabin/Features/Home/HomeView.swift over PlaneZero).
+   Every number here is ported, not invented:
+     Typography.swift  display 36/bold/-0.5 · heroNumeral 68/black/-1.5 · heroUnit 24/semibold/.7α
+                       caption 13/regular/.75α · micro 11 · nano 8/medium — SF Pro, width axis 0.32
+     GlassRole.swift   Shapes.pill = capsule · Metrics: pillHeight 52, pillMinWidth 52,
+                       compact hPadding 12, screenMargin 20 · Shapes.sheet r36
+     LockSwitch.swift  width 56, cellHeight 62, puck inset 4, glyph 19/semibold
+     GlassPill.swift   glyph 20/light, caption 8pt under it, height 52+12 with a caption
+     AmbientTint.swift accent #E31937 (Tesla red, fixed) · base #2F3134 graphite
+                       ink ladder 1 / .65 / .42 / .25
+     ConnectionState   .waking → a travelling highlight, period 3.2s (the only ambient loop)
+   Plane 0 is HeroTunnel.jpg — a red Model 3 in a lit concrete tunnel. No photograph here,
+   so the tunnel is rebuilt as a pre-projected SVG: strip lights, wall streaks and lane
+   lines already sitting at their real depth, marching at the viewer as --p advances.
+   Every id in the artwork is cabin-prefixed so a second component cannot capture them.  */
+
+.c-cabin{
+  --_p: var(--p, 1);
+  --red: #E31937;                      /* AmbientTint.accent — the car, and the one lock */
+  --ink-1: var(--ink, #fff);
+  --ink-65: rgba(255,255,255,.65);     /* InkLevel.secondary */
+  --ink-42: rgba(255,255,255,.42);     /* InkLevel.tertiary  */
+  --line: var(--hairline, rgba(255,255,255,.11));
+
+  container-type: inline-size;
+  position: relative;
+  isolation: isolate;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 34rem;
+  margin: 0 auto;
+  font-family: var(--sans, "Figtree", -apple-system, BlinkMacSystemFont, system-ui, sans-serif);
+  color: var(--ink-1);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.c-cabin *{ box-sizing: border-box; }
+
+/* 1 app point ≈ 0.2545cqw (a 393pt screen across the stage), floored so 360px stays legible.
+   Declared on the children: container units never resolve against their own container. */
+.c-cabin > *{ --pt: max(.0455rem, .2545cqw); }
+
+/* ── the screen ───────────────────────────────────────────────────────────── */
+.c-cabin .screen{
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1.06;
+  max-height: 100%;
+  overflow: hidden;
+  border-radius: calc(36 * var(--pt));   /* Shapes.sheet */
+  background: #000;
+  box-shadow: 0 0 0 1px var(--line), 0 calc(6 * var(--pt)) calc(30 * var(--pt)) rgba(0,0,0,.6);
+}
+
+/* ── Plane 0: the tunnel ──────────────────────────────────────────────────── */
+.c-cabin .field{
+  position: absolute; inset: 0;
+  overflow: hidden;
+  background: #040405;
+}
+/* the tunnel itself is a projected SVG: four planes meeting at the vanishing
+   point, plus strip lights, wall smears and lane lines drawn at their real depth.
+   Forward motion in a perspective projection IS a scale about the vanishing point,
+   so the whole scene marches at the viewer on one rule. */
+.c-cabin .tunnel{
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  display: block;
+}
+.c-cabin .mv{
+  /* current depth: the camera advances 4.2m over the scroll */
+  --zc: calc(var(--z0) - 4.2 * var(--_p));
+  transform-box: view-box;
+  transform-origin: 57% 43%;                /* the vanishing point */
+  transform: scale(calc(var(--z0) / var(--zc)));
+  opacity: calc(
+    clamp(0, calc((62 - var(--zc)) / 16), 1) *
+    clamp(0, calc((var(--zc) - 2) / 1.7), 1) *
+    var(--o, 1));
+  /* deliberately no will-change: there are 43 .mv nodes and promoting every one
+     of them costs far more than it buys. The two big movers below opt in. */
+}
+/* the concrete smears as it goes past; the lane lines stay crisp */
+.c-cabin .streak{ filter: blur(2.2px); }
+.c-cabin .lane{ filter: blur(.5px); }
+
+/* the car */
+.c-cabin .car{
+  position: absolute; left: 52.5%; bottom: 23.5%;
+  width: 104%;
+  transform: translateX(-50%) scale(calc(.93 + var(--_p) * .11));
+  transform-origin: 50% 100%;
+  filter: drop-shadow(0 1.4cqw 2.6cqw rgba(0,0,0,.62));
+  will-change: transform;
+}
+/* the car is drawn, not photographed — so no cut-out mask, just kill the
+   inline-baseline gap under the svg and let the viewBox set the height */
+/* The photograph replaces the drawn car: fade its edges into the scene so it reads
+   as depth rather than a pasted rectangle. */
+.c-cabin .car img{
+  display: block; width: 100%; height: auto;
+  -webkit-mask-image: radial-gradient(130% 112% at 50% 54%, #000 44%, transparent 78%);
+  mask-image: radial-gradient(130% 112% at 50% 54%, #000 44%, transparent 78%);
+}
+/* red bounce off the concrete, and the headlight wash on the floor */
+.c-cabin .bounce{
+  position: absolute; left: 52.5%; bottom: 19%;
+  width: 54%; height: 12%;
+  transform: translateX(-50%);
+  background: radial-gradient(50% 62% at 50% 40%, rgba(227,25,55,.3), rgba(227,25,55,0) 74%);
+  filter: blur(1cqw);
+  opacity: calc(.4 + var(--_p) * .6);
+}
+.c-cabin .throw{
+  position: absolute; left: 52.5%; bottom: 8%;
+  width: 66%; height: 15%;
+  transform: translateX(-50%);
+  background:
+    radial-gradient(30% 84% at 26% 0%, rgba(222,234,252,.26), rgba(222,234,252,0) 72%),
+    radial-gradient(30% 84% at 74% 0%, rgba(222,234,252,.26), rgba(222,234,252,0) 72%);
+  filter: blur(1.1cqw);
+  opacity: calc(.3 + var(--_p) * .7);
+}
+
+/* vignette + the top fall-off the type sits in */
+.c-cabin .veil{
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.86) 0%, rgba(0,0,0,.34) 22%, rgba(0,0,0,0) 42%),
+    linear-gradient(0deg, rgba(0,0,0,.78) 0%, rgba(0,0,0,.16) 22%, rgba(0,0,0,0) 40%),
+    radial-gradient(120% 88% at 50% 46%, rgba(0,0,0,0) 44%, rgba(0,0,0,.62) 100%);
+}
+
+/* ── Plane 1: the interface ───────────────────────────────────────────────── */
+.c-cabin .ui{
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  padding: calc(24 * var(--pt)) calc(20 * var(--pt)) calc(20 * var(--pt));
+}
+
+/* LegibilityScrim — inverse ink, radial, sized past the text bounds.
+   isolation is load-bearing: without a stacking context of its own the z-index:-1
+   pseudo escapes to .c-cabin and paints under .screen's opaque black, i.e. vanishes.
+   (.charge got away with it only because its transform makes a context by accident.) */
+.c-cabin .scrim{ position: relative; isolation: isolate; }
+.c-cabin .scrim::before{
+  content: ""; position: absolute; inset: -22% -10%;
+  background: radial-gradient(closest-side, rgba(0,0,0,.42), rgba(0,0,0,0) 78%);
+  z-index: -1; pointer-events: none;
+}
+
+/* header */
+.c-cabin .head{ --r: clamp(0, calc(var(--_p) * 7), 1); }
+.c-cabin .name{
+  margin: 0;
+  font-size: calc(36 * var(--pt));
+  font-weight: 800;
+  letter-spacing: -.014em;
+  line-height: 1.02;
+  opacity: var(--r);
+  transform: translate3d(0, calc((1 - var(--r)) * 1.6cqw), 0);
+}
+.c-cabin .sub{
+  margin: calc(4 * var(--pt)) 0 0;
+  font-size: calc(13 * var(--pt));
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.28;
+  color: rgba(255,255,255,.49);        /* caption .75α over InkLevel.secondary .65 */
+  opacity: clamp(0, calc((var(--_p) - .03) * 7), 1);
+  transform: translate3d(0, calc((1 - clamp(0, calc((var(--_p) - .03) * 7), 1)) * 1.2cqw), 0);
+}
+.c-cabin .stale{ font-size: calc(11 * var(--pt)); }
+
+/* middle: LockSwitch + the hero value */
+.c-cabin .mid{
+  display: flex; align-items: center;
+  gap: calc(18 * var(--pt));
+  margin-top: calc(18 * var(--pt));
+}
+
+/* the glass recipe: GlassRole .clear — refracts Plane 0, never frosts it */
+.c-cabin .glass{
+  position: relative;
+  background: linear-gradient(180deg, rgba(255,255,255,.13), rgba(255,255,255,.045));
+  -webkit-backdrop-filter: blur(1.5cqw) saturate(1.35);
+  backdrop-filter: blur(1.5cqw) saturate(1.35);
+  box-shadow:
+    inset 0 .14cqw 0 rgba(255,255,255,.26),
+    inset 0 -.12cqw 0 rgba(255,255,255,.07),
+    inset 0 0 0 .1cqw rgba(255,255,255,.13),
+    0 .7cqw 1.8cqw rgba(0,0,0,.34);
+}
+
+.c-cabin .lock{
+  flex: none;
+  width: calc(56 * var(--pt));
+  height: calc(124 * var(--pt));        /* 2 × cellHeight 62 */
+  border-radius: 999px;
+  display: flex; flex-direction: column;
+  --r: clamp(0, calc((var(--_p) - .04) * 5), 1);
+  opacity: var(--r);
+  transform: translate3d(calc((var(--r) - 1) * 2.4cqw), 0, 0);
+}
+/* ConnectionState.waking — the travelling highlight, period 3.2s */
+@property --cabin-a{ syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+.c-cabin .lock::after{
+  content: ""; position: absolute; inset: 0;
+  border-radius: inherit; padding: .18cqw;
+  background: conic-gradient(from var(--cabin-a, 0deg),
+    rgba(255,255,255,0) 0 58%, rgba(255,255,255,.85) 72%, rgba(255,255,255,0) 84% 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: cabin-wake 3.2s linear infinite;
+  pointer-events: none;
+}
+@keyframes cabin-wake{ to{ --cabin-a: 360deg; } }
+
+.c-cabin .cell{
+  position: relative;
+  flex: 1 1 0;
+  display: grid; place-items: center;
+}
+.c-cabin .cell svg{
+  position: relative; z-index: 1;
+  width: calc(21 * var(--pt)); height: calc(21 * var(--pt));
+}
+.c-cabin .cell.off svg{ color: var(--ink-42); }
+.c-cabin .cell.on  svg{ color: #fff; }
+/* the puck: GlassRole.stateOn, tinted accent — the one red thing in the interface */
+.c-cabin .puck{
+  position: absolute; inset: calc(4 * var(--pt));
+  border-radius: 999px;
+  background: linear-gradient(180deg, #F0364F 0%, var(--red) 46%, #B5122B 100%);
+  box-shadow:
+    inset 0 .16cqw 0 rgba(255,255,255,.42),
+    inset 0 -.14cqw 0 rgba(0,0,0,.28),
+    0 .5cqw 1.5cqw rgba(227,25,55,.5);
+  transform: scale(calc(.86 + clamp(0, calc((var(--_p) - .08) * 6), 1) * .14));
+}
+
+/* hero value */
+.c-cabin .charge{
+  --r: clamp(0, calc((var(--_p) - .08) * 5), 1);
+  opacity: var(--r);
+  transform: translate3d(0, calc((1 - var(--r)) * 1.8cqw), 0);
+  min-width: 0;
+}
+.c-cabin .value{
+  display: flex; align-items: flex-end;
+  gap: calc(2 * var(--pt));
+  font-weight: 900;
+  font-size: calc(68 * var(--pt));
+  letter-spacing: -.022em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+/* the count-up: one reel of 55 cells, stepped by round() so it lands on whole numbers */
+.c-cabin .mask{
+  --cell: 1em;
+  --bp: clamp(0, calc((var(--_p) - .12) * 1.72), 1);
+  display: block; height: var(--cell); overflow: hidden;
+}
+.c-cabin .reel{
+  display: block;
+  transform: translate3d(0, calc(var(--bp) * -54 * var(--cell)), 0);
+  transform: translate3d(0, calc(round(down, calc(var(--bp) * 54), 1) * -1 * var(--cell)), 0);
+  will-change: transform;
+}
+.c-cabin .reel i{
+  display: block; height: var(--cell); line-height: var(--cell);
+  text-align: right; font-style: normal;
+}
+.c-cabin .unit{
+  font-size: calc(24 * var(--pt));
+  font-weight: 600;
+  letter-spacing: -.012em;
+  line-height: 1;
+  opacity: .7;                          /* TypeRole.heroUnit carries its own .7 */
+  margin-bottom: calc(5.7 * var(--pt));
+}
+.c-cabin .range{
+  margin: calc(2 * var(--pt)) 0 0;
+  font-size: calc(13 * var(--pt));
+  color: rgba(255,255,255,.49);
+}
+
+/* ── the control row ──────────────────────────────────────────────────────── */
+.c-cabin .row{
+  margin-top: auto;
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: calc(6 * var(--pt));
+}
+.c-cabin .slot{
+  --r: clamp(0, calc((var(--_p) - .42 - var(--n) * .06) * 5), 1);
+  flex: 0 1 auto; min-width: 0;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: calc(2 * var(--pt));
+  height: calc(64 * var(--pt));          /* pillHeight 52 + 12 for the caption */
+  min-width: calc(52 * var(--pt));
+  padding: 0 calc(12 * var(--pt));       /* isCompact */
+  border-radius: 999px;
+  opacity: var(--r);
+  transform: translate3d(0, calc((1 - var(--r)) * 2.6cqw), 0) scale(calc(.92 + var(--r) * .08));
+}
+.c-cabin .slot svg{
+  width: calc(20 * var(--pt)); height: calc(20 * var(--pt));
+  flex: none;
+}
+.c-cabin .cap{
+  font-size: max(.5rem, calc(8 * var(--pt)));
+  font-weight: 500;
+  line-height: 1.1;
+  color: var(--ink-65);
+  white-space: nowrap;
+}
+/* the readout pill: glyph + value on one line, caption under (GlassValuePill) */
+.c-cabin .slot.readout{ flex: 0 1 auto; padding: 0 calc(11 * var(--pt)); }
+.c-cabin .readout .line{
+  display: flex; align-items: center; gap: calc(6 * var(--pt));
+  font-size: calc(15 * var(--pt)); font-weight: 600; letter-spacing: -.008em;
+  white-space: nowrap;
+}
+/* the charge meter: a hairline of accent along the foot of the battery pill */
+.c-cabin .readout::after{
+  content: ""; position: absolute;
+  left: calc(16 * var(--pt)); bottom: calc(9 * var(--pt));
+  height: .38cqw; border-radius: 999px;
+  width: calc(clamp(0, calc((var(--_p) - .5) * 2.6), 1) * 54 * (100% - 32 * var(--pt)) / 100);
+  background: linear-gradient(90deg, #F0364F, var(--red));
+  box-shadow: 0 0 .9cqw rgba(227,25,55,.75);
+}
+.c-cabin .readout .track{
+  position: absolute; left: calc(16 * var(--pt)); right: calc(16 * var(--pt));
+  bottom: calc(9 * var(--pt)); height: .38cqw; border-radius: 999px;
+  background: rgba(255,255,255,.16);
+}
+/* the battery glyph's own fill ramps with it */
+.c-cabin .juice{
+  transform-box: fill-box; transform-origin: left center;
+  transform: scaleX(clamp(.06, calc((var(--_p) - .5) * 2.6 * .54), .54));
+}
+
+/* --p is pinned rather than --p's consumers: --_p is internal, so a host that drives
+   the component with an inline style="--p:…" cannot out-specify this. */
+@media (prefers-reduced-motion: reduce){
+  .c-cabin{ --p: 1; --_p: 1; }
+  .c-cabin .lock::after{ animation: none; }
+}
+</style>
+
+<div class="c-cabin">
+  <div class="screen">
+
+    <div class="field" aria-hidden="true">
+      <svg class="tunnel" viewBox="0 0 400 424" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="cabinCeil" gradientUnits="userSpaceOnUse" x1="0" y1="182" x2="0" y2="-140">
+          <stop offset="0" stop-color="#15181b"/><stop offset=".42" stop-color="#0b0d0f"/>
+          <stop offset="1" stop-color="#040405"/></linearGradient>
+        <linearGradient id="cabinFloor" gradientUnits="userSpaceOnUse" x1="0" y1="182" x2="0" y2="424">
+          <stop offset="0" stop-color="#191c20"/><stop offset=".2" stop-color="#31363b"/>
+          <stop offset=".52" stop-color="#43484e"/><stop offset=".8" stop-color="#26292c"/>
+          <stop offset="1" stop-color="#141517"/></linearGradient>
+        <linearGradient id="cabinWallL" gradientUnits="userSpaceOnUse" x1="228" y1="0" x2="-90" y2="0">
+          <stop offset="0" stop-color="#1c1f23"/><stop offset=".5" stop-color="#121417"/>
+          <stop offset="1" stop-color="#0a0b0d"/></linearGradient>
+        <linearGradient id="cabinWallR" gradientUnits="userSpaceOnUse" x1="228" y1="0" x2="490" y2="0">
+          <stop offset="0" stop-color="#262b30"/><stop offset=".4" stop-color="#454b52"/>
+          <stop offset=".76" stop-color="#666d75"/><stop offset="1" stop-color="#383c41"/></linearGradient>
+        <linearGradient id="cabinEdgeL" gradientUnits="userSpaceOnUse" x1="-40" y1="0" x2="228" y2="0">
+          <stop offset="0" stop-color="#7c838b" stop-opacity=".55"/>
+          <stop offset="1" stop-color="#7c838b" stop-opacity="0"/></linearGradient>
+        <linearGradient id="cabinEdgeR" gradientUnits="userSpaceOnUse" x1="440" y1="0" x2="228" y2="0">
+          <stop offset="0" stop-color="#c3cad2" stop-opacity=".7"/>
+          <stop offset="1" stop-color="#c3cad2" stop-opacity="0"/></linearGradient>
+        <radialGradient id="cabinPool" gradientUnits="userSpaceOnUse" cx="200" cy="316" r="185">
+          <stop offset="0" stop-color="#d8e2ee" stop-opacity=".14"/>
+          <stop offset="1" stop-color="#d8e2ee" stop-opacity="0"/></radialGradient>
+        <radialGradient id="cabinHaze" gradientUnits="userSpaceOnUse" cx="228" cy="182" r="168">
+          <stop offset="0" stop-color="#9aa6b4" stop-opacity=".13"/>
+          <stop offset=".55" stop-color="#7f8a97" stop-opacity=".05"/>
+          <stop offset="1" stop-color="#7f8a97" stop-opacity="0"/></radialGradient>
+        <filter id="cabinGrain" x="0" y="0" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch"/>
+          <feColorMatrix type="saturate" values="0"/></filter>
+        <filter id="cabinSoft" filterUnits="userSpaceOnUse" x="-260" y="-300" width="920" height="1100">
+          <feGaussianBlur stdDeviation="3.4"/></filter>
+        <filter id="cabinBloom" filterUnits="userSpaceOnUse" x="-260" y="-300" width="920" height="1100">
+          <feGaussianBlur stdDeviation="4.5"/></filter>
+      </defs>
+      <g filter="url(#cabinSoft)"><polygon points="-552.7,-321.7 1008.7,-321.7 228.0,182.0" fill="url(#cabinCeil)"/><polygon points="-552.7,471.6 1008.7,471.6 228.0,182.0" fill="url(#cabinFloor)"/><polygon points="-552.7,-321.7 -552.7,471.6 228.0,182.0" fill="url(#cabinWallL)"/><polygon points="1008.7,-321.7 1008.7,471.6 228.0,182.0" fill="url(#cabinWallR)"/><polygon points="-326.7,-175.9 -326.7,-498.0 228.0,182.0" fill="url(#cabinEdgeL)"/><polygon points="-326.7,387.8 -326.7,624.0 228.0,182.0" fill="url(#cabinEdgeL)"/><polygon points="782.7,-175.9 782.7,-498.0 228.0,182.0" fill="url(#cabinEdgeR)"/><polygon points="782.7,387.8 782.7,624.0 228.0,182.0" fill="url(#cabinEdgeR)"/></g>
+      <ellipse cx="228" cy="182" rx="168" ry="104" fill="url(#cabinHaze)"/>
+      <g filter="url(#cabinBloom)" opacity=".8"><polygon class="mv lamp" style="--z0:8.50;--o:0.82" points="210.0,102.0 222.0,102.0 223.3,119.0 213.8,119.0" fill="#ffffff"/><polygon class="mv lamp" style="--z0:10.88;--o:0.64" points="213.9,119.5 223.3,119.5 224.1,130.4 216.4,130.4" fill="#ffffff"/><polygon class="mv lamp" style="--z0:13.93;--o:0.50" points="217.0,133.2 224.3,133.2 224.9,140.1 218.6,140.1" fill="#ffffff"/><polygon class="mv lamp" style="--z0:17.83;--o:0.39" points="219.4,143.9 225.1,143.9 225.5,148.2 220.4,148.2" fill="#ffffff"/><polygon class="mv lamp" style="--z0:22.82;--o:0.31" points="221.3,152.2 225.8,152.2 226.0,154.9 221.9,154.9" fill="#ffffff"/><polygon class="mv lamp" style="--z0:29.21;--o:0.24" points="222.8,158.7 226.3,158.7 226.4,160.4 223.1,160.4" fill="#ffffff"/><polygon class="mv lamp" style="--z0:37.38;--o:0.19" points="223.9,163.8 226.6,163.8 226.7,164.9 224.1,164.9" fill="#ffffff"/><polygon class="mv lamp" style="--z0:47.85;--o:0.18" points="224.8,167.8 226.9,167.8 227.0,168.4 224.9,168.4" fill="#ffffff"/><polygon class="mv lamp" style="--z0:61.25;--o:0.18" points="225.5,170.9 227.2,170.9 227.2,171.3 225.6,171.3" fill="#ffffff"/><polygon class="mv lamp" style="--z0:78.40;--o:0.18" points="226.0,173.3 227.3,173.3 227.4,173.6 226.1,173.6" fill="#ffffff"/><polygon class="mv lamp" style="--z0:100.35;--o:0.18" points="226.5,175.2 227.5,175.2 227.5,175.4 226.5,175.4" fill="#ffffff"/><polygon class="mv lamp" style="--z0:128.45;--o:0.18" points="226.8,176.7 227.6,176.7 227.6,176.8 226.8,176.8" fill="#ffffff"/><polygon class="mv lamp" style="--z0:10.20;--o:0.27" points="289.3,115.3 296.7,115.3 286.4,125.3 280.1,125.3" fill="#ffffff"/><polygon class="mv lamp" style="--z0:13.26;--o:0.21" points="275.2,130.7 280.8,130.7 274.5,136.8 269.5,136.8" fill="#ffffff"/><polygon class="mv lamp" style="--z0:17.24;--o:0.16" points="264.3,142.6 268.6,142.6 264.8,146.3 260.9,146.3" fill="#ffffff"/><polygon class="mv lamp" style="--z0:22.41;--o:0.12" points="255.9,151.7 259.3,151.7 256.9,153.9 253.8,153.9" fill="#ffffff"/><polygon class="mv lamp" style="--z0:29.13;--o:0.10" points="249.5,158.7 252.0,158.7 250.6,160.0 248.2,160.0" fill="#ffffff"/><polygon class="mv lamp" style="--z0:37.87;--o:0.07" points="244.5,164.0 246.5,164.0 245.7,164.9 243.8,164.9" fill="#ffffff"/><polygon class="mv lamp" style="--z0:49.23;--o:0.07" points="240.7,168.2 242.2,168.2 241.7,168.7 240.3,168.7" fill="#ffffff"/><polygon class="mv lamp" style="--z0:64.00;--o:0.07" points="237.8,171.4 238.9,171.4 238.6,171.7 237.5,171.7" fill="#ffffff"/></g>
+      <polygon class="mv lamp" style="--z0:8.50;--o:0.82" points="210.0,102.0 222.0,102.0 223.3,119.0 213.8,119.0" fill="#ffffff"/>
+      <polygon class="mv lamp" style="--z0:10.88;--o:0.64" points="213.9,119.5 223.3,119.5 224.1,130.4 216.4,130.4" fill="#ffffff"/>
+      <polygon class="mv lamp" style="--z0:13.93;--o:0.50" points="217.0,133.2 224.3,133.2 224.9,140.1 218.6,140.1" fill="#ffffff"/>
+      <polygon class="mv lamp" style="--z0:17.83;--o:0.39" points="219.4,143.9 225.1,143.9 225.5,148.2 220.4,148.2" fill="#ffffff"/>
+      <polygon class="mv lamp" style="--z0:22.82;--o:0.31" points="221.3,152.2 225.8,152.2 226.0,154.9 221.9,154.9" fill="#ffffff"/>
+      <polygon class="mv lamp" style="--z0:29.21;--o:0.24" points="222.8,158.7 226.3,158.7 226.4,160.4 223.1,160.4" fill="#ffffff"/>
+      <polygon class="mv lamp" style="--z0:37.38;--o:0.19" points="223.9,163.8 226.6,163.8 226.7,164.9 224.1,164.9" fill="#ffffff"/>
+      <polygon class="mv lamp" style="--z0:47.85;--o:0.18" points="224.8,167.8 226.9,167.8 227.0,168.4 224.9,168.4" fill="#ffffff"/>
+      <polygon class="mv lamp" style="--z0:61.25;--o:0.18" points="225.5,170.9 227.2,170.9 227.2,171.3 225.6,171.3" fill="#ffffff"/>
+      <polygon class="mv lamp" style="--z0:78.40;--o:0.18" points="226.0,173.3 227.3,173.3 227.4,173.6 226.1,173.6" fill="#ffffff"/>
+      <polygon class="mv lamp" style="--z0:100.35;--o:0.18" points="226.5,175.2 227.5,175.2 227.5,175.4 226.5,175.4" fill="#ffffff"/>
+      <polygon class="mv lamp" style="--z0:128.45;--o:0.18" points="226.8,176.7 227.6,176.7 227.6,176.8 226.8,176.8" fill="#ffffff"/>
+      <polygon class="mv lamp" style="--z0:10.20;--o:0.27" points="289.3,115.3 296.7,115.3 286.4,125.3 280.1,125.3" fill="#ffffff"/>
+      <polygon class="mv lamp" style="--z0:13.26;--o:0.21" points="275.2,130.7 280.8,130.7 274.5,136.8 269.5,136.8" fill="#ffffff"/>
+      <polygon class="mv lamp" style="--z0:17.24;--o:0.16" points="264.3,142.6 268.6,142.6 264.8,146.3 260.9,146.3" fill="#ffffff"/>
+      <polygon class="mv lamp" style="--z0:22.41;--o:0.12" points="255.9,151.7 259.3,151.7 256.9,153.9 253.8,153.9" fill="#ffffff"/>
+      <polygon class="mv lamp" style="--z0:29.13;--o:0.10" points="249.5,158.7 252.0,158.7 250.6,160.0 248.2,160.0" fill="#ffffff"/>
+      <polygon class="mv lamp" style="--z0:37.87;--o:0.07" points="244.5,164.0 246.5,164.0 245.7,164.9 243.8,164.9" fill="#ffffff"/>
+      <polygon class="mv lamp" style="--z0:49.23;--o:0.07" points="240.7,168.2 242.2,168.2 241.7,168.7 240.3,168.7" fill="#ffffff"/>
+      <polygon class="mv lamp" style="--z0:64.00;--o:0.07" points="237.8,171.4 238.9,171.4 238.6,171.7 237.5,171.7" fill="#ffffff"/>
+      <polygon class="mv streak" style="--z0:5.40;--o:0.22" points="32.8,226.8 32.8,231.6 122.6,208.8 122.6,206.2" fill="#ffffff"/>
+      <polygon class="mv streak" style="--z0:7.20;--o:0.26" points="81.6,163.7 81.6,167.3 144.3,173.6 144.3,171.5" fill="#ffffff"/>
+      <polygon class="mv streak" style="--z0:9.60;--o:0.20" points="118.2,132.8 118.2,135.5 161.3,153.8 161.3,152.1" fill="#ffffff"/>
+      <polygon class="mv streak" style="--z0:12.40;--o:0.22" points="143.0,186.4 143.0,188.5 174.2,186.1 174.2,184.8" fill="#ffffff"/>
+      <polygon class="mv streak" style="--z0:16.00;--o:0.18" points="162.1,161.0 162.1,162.6 184.1,169.1 184.1,168.0" fill="#ffffff"/>
+      <polygon class="mv streak" style="--z0:21.00;--o:0.15" points="177.8,179.8 177.8,181.0 192.9,181.3 192.9,180.4" fill="#ffffff"/>
+      <polygon class="mv streak" style="--z0:27.00;--o:0.12" points="189.0,160.1 189.0,161.1 199.5,166.7 199.5,166.0" fill="#ffffff"/>
+      <polygon class="mv streak" style="--z0:4.80;--o:0.50" points="447.6,221.8 447.6,227.2 340.1,205.1 340.1,202.3" fill="#ffffff"/>
+      <polygon class="mv streak" style="--z0:6.40;--o:0.56" points="392.7,150.8 392.7,154.8 317.3,167.2 317.3,165.1" fill="#ffffff"/>
+      <polygon class="mv streak" style="--z0:8.60;--o:0.44" points="350.6,123.2 350.6,126.2 299.2,149.6 299.2,147.8" fill="#ffffff"/>
+      <polygon class="mv streak" style="--z0:11.20;--o:0.48" points="322.1,183.9 322.1,186.2 285.3,184.6 285.3,183.1" fill="#ffffff"/>
+      <polygon class="mv streak" style="--z0:14.60;--o:0.38" points="300.2,159.0 300.2,160.8 274.6,168.3 274.6,167.1" fill="#ffffff"/>
+      <polygon class="mv streak" style="--z0:19.00;--o:0.30" points="283.5,148.2 283.5,149.6 265.6,160.0 265.6,159.1" fill="#ffffff"/>
+      <polygon class="mv streak" style="--z0:25.00;--o:0.24" points="270.2,177.4 270.2,178.4 258.1,179.5 258.1,178.7" fill="#ffffff"/>
+      <polygon class="mv lane" style="--z0:4.40;--o:0.34" points="79.2,270.9 90.8,270.9 139.2,239.5 131.8,239.5" fill="#ffffff"/>
+      <polygon class="mv lane" style="--z0:8.20;--o:0.26" points="148.2,229.7 154.4,229.7 173.1,217.5 168.5,217.5" fill="#ffffff"/>
+      <polygon class="mv lane" style="--z0:13.40;--o:0.18" points="179.2,211.2 183.0,211.2 191.6,205.6 188.6,205.6" fill="#ffffff"/>
+      <polygon class="mv lane" style="--z0:20.00;--o:0.12" points="195.3,201.6 197.8,201.6 202.4,198.6 200.3,198.6" fill="#ffffff"/>
+      <polygon class="mv lane" style="--z0:5.00;--o:0.50" points="379.3,260.2 389.5,260.2 334.2,233.4 327.5,233.4" fill="#d6ac36"/>
+      <polygon class="mv lane" style="--z0:9.40;--o:0.38" points="308.5,223.6 313.9,223.6 293.1,213.5 289.0,213.5" fill="#d6ac36"/>
+      <polygon class="mv lane" style="--z0:15.00;--o:0.26" points="278.4,208.1 281.8,208.1 271.9,203.2 269.1,203.2" fill="#d6ac36"/>
+      <polygon class="mv lane" style="--z0:22.00;--o:0.16" points="262.4,199.8 264.7,199.8 259.3,197.2 257.3,197.2" fill="#d6ac36"/>
+      <ellipse cx="200" cy="316" rx="185" ry="62" fill="url(#cabinPool)"/>
+      <rect width="400" height="424" filter="url(#cabinGrain)" opacity=".055" style="mix-blend-mode:overlay"/>
+      </svg>
+
+      <div class="bounce"></div>
+      <div class="throw"></div>
+
+      <div class="car">
+        <img src="assets/art/cabin-car.webp" alt="" width="900" height="776" loading="lazy" decoding="async">
+      </div>
+
+      <div class="veil"></div>
+    </div>
+
+    <div class="ui">
+      <div class="head scrim">
+        <p class="name">Toothless</p>
+        <p class="sub">Waking… · Cabin 36° <span class="stale">· Updated 11 hours ago</span></p>
+      </div>
+
+      <div class="mid">
+        <div class="lock glass" role="img" aria-label="Lock switch — locked">
+          <div class="cell off">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9.6 10.4V7.5a3.9 3.9 0 0 1 7.8 0v1.3"/>
+              <rect x="5.2" y="10.4" width="13.6" height="9.8" rx="3.1"/>
+            </svg>
+          </div>
+          <div class="cell on">
+            <span class="puck"></span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M8.2 10.4V7.5a3.8 3.8 0 0 1 7.6 0v2.9"/>
+              <rect x="5.2" y="10.4" width="13.6" height="9.8" rx="3.1"
+                    fill="currentColor" stroke="none"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="charge scrim">
+          <div class="value">
+            <span class="mask" role="img" aria-label="54 percent"><span class="reel"><i>0</i><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i><i>7</i><i>8</i><i>9</i><i>10</i><i>11</i><i>12</i><i>13</i><i>14</i><i>15</i><i>16</i><i>17</i><i>18</i><i>19</i><i>20</i><i>21</i><i>22</i><i>23</i><i>24</i><i>25</i><i>26</i><i>27</i><i>28</i><i>29</i><i>30</i><i>31</i><i>32</i><i>33</i><i>34</i><i>35</i><i>36</i><i>37</i><i>38</i><i>39</i><i>40</i><i>41</i><i>42</i><i>43</i><i>44</i><i>45</i><i>46</i><i>47</i><i>48</i><i>49</i><i>50</i><i>51</i><i>52</i><i>53</i><i>54</i></span></span>
+            <span class="unit" aria-hidden="true">%</span>
+          </div>
+          <p class="range">227 km</p>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="slot glass" style="--n:0">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <g>
+              <path d="M12 11.4c0-6 1.8-8.6 4-8.6s3.6 1.9 3.6 4.1c0 2.9-3.1 4.9-7.6 4.9"/>
+              <path d="M12.6 12c6 0 8.6 1.8 8.6 4s-1.9 3.6-4.1 3.6c-2.9 0-4.9-3.1-4.9-7.6"/>
+              <path d="M12 12.6c0 6-1.8 8.6-4 8.6s-3.6-1.9-3.6-4.1c0-2.9 3.1-4.9 7.6-4.9"/>
+              <path d="M11.4 12c-6 0-8.6-1.8-8.6-4s1.9-3.6 4.1-3.6c2.9 0 4.9 3.1 4.9 7.6"/>
+            </g>
+            <circle cx="12" cy="12" r="1.5"/>
+          </svg>
+          <span class="cap">Climate</span>
+        </div>
+
+        <div class="slot glass" style="--n:1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M2.4 8.2h10.9a2.5 2.5 0 1 0-2.5-2.5"/>
+            <path d="M2.4 12.4h14a2.5 2.5 0 1 1-2.5 2.5"/>
+            <path d="M2.4 16.6h8.6a2.3 2.3 0 1 1-2.3 2.3"/>
+          </svg>
+          <span class="cap">Vent On</span>
+        </div>
+
+        <div class="slot glass" style="--n:2">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M13.4 1.6 10 6.6h2.6L10.6 10 14.6 5h-2.7z" fill="currentColor" stroke="none"/>
+            <path d="M2.2 17.6v-2.4c0-.9.6-1.6 1.4-1.8l2.6-.6 2.3-2.6c.5-.5 1.2-.9 1.9-.9h4.6c.8 0 1.5.3 2 .9l2.1 2.6 1.5.5c.8.3 1.2 1 1.2 1.8v2.5"/>
+            <path d="M2.2 17.6h1.4M9.5 17.6h5M20.4 17.6h1.4"/>
+            <circle cx="6.6" cy="17.6" r="2.1"/>
+            <circle cx="17.4" cy="17.6" r="2.1"/>
+          </svg>
+          <span class="cap">Port</span>
+        </div>
+
+        <div class="slot glass" style="--n:3">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M2.2 17.4v-2.3c0-.9.6-1.6 1.4-1.8l2.5-.6 2.3-2.6c.5-.5 1.2-.9 1.9-.9h4.6c.8 0 1.5.3 2 .9l2.1 2.6 1.5.5c.8.3 1.2 1 1.2 1.8v2.4"/>
+            <path d="M2.2 17.4h1.4M9.4 17.4h5.2M20.3 17.4h1.5"/>
+            <circle cx="6.5" cy="17.4" r="2.1"/>
+            <circle cx="17.4" cy="17.4" r="2.1"/>
+            <path d="M8.6 9.4 4.2 4.6M6.4 11 2.2 6.4"/>
+          </svg>
+          <span class="cap">Trunk</span>
+        </div>
+
+        <div class="slot readout glass" style="--n:4">
+          <span class="line">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="1.6" y="7.6" width="17" height="8.8" rx="2.8"/>
+              <path d="M21 10.8v2.4" stroke-width="2"/>
+              <rect class="juice" x="3.4" y="9.4" width="13.4" height="5.2" rx="1.4"
+                    fill="currentColor" stroke="none"/>
+            </svg>
+            <span>54%</span>
+          </span>
+          <span class="cap">Battery</span>
+          <span class="track" aria-hidden="true"></span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

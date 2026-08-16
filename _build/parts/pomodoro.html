@@ -1,0 +1,505 @@
+<style>
+/* ---------- component: Pomodoro — the running timer ----------
+   Recreates Pomodoro's main screen (Pomodoro/ViewController.swift +
+   Base.lproj/Main.storyboard + GlassKit.swift).
+
+   Numbers taken from the app, in points, then scaled by --pt:
+     session pill      capsule, glass tinted accent @ .13 (applyGlass, l.320)
+                       label SFCompactRounded-Medium 16, accent
+                       chevron.down 6pt bold, alpha .6, accent
+     pinned task       label SFCompactRounded-Medium 15, accent, centred
+     ring              diameter = 0.3 × screen height (255pt), band =
+                       max(14, ringWidth × 1.15) = 18.4pt (installTimerGlass)
+                       base ring   accent @ .22   (GlassProgressRing.setTint)
+                       track       regular glass  (elapsed)
+                       fill        clear glass, accent @ .30 tint, butt caps
+                       start angle -π/2, clockwise
+     minutes label     SFCompactRounded-Light 72, accent, "%d:%02d"
+     play/pause        clear glass capsule 148 × 54, label 17 semibold, .label
+     session dots      12pt circles, 1pt border accent @ .55, numeral
+                       SFCompactRounded-Light 9, secondaryLabel, inside a
+                       glass capsule inset (+28 wide, +18 tall)
+     tasks / settings  50pt glass discs (cornerRadius 25), bottom corners
+     backdrop          GlassBackdrop .subtle — two accent radial blooms,
+                       peak alpha .16 top / .11 bottom, one hue only
+   Accent is systemIndigo (ThemeManager default), i.e. the panel's --accent.
+
+   --p drives the session: the ring unwinds from a full turn and the clock
+   counts 25:00 down to 5:00.                                              */
+
+.c-pomodoro,
+.c-pomodoro *,
+.c-pomodoro *::before,
+.c-pomodoro *::after { box-sizing: border-box; }
+
+.c-pomodoro {
+  --acc: var(--accent, #5E5CE6);
+  --_p: clamp(0, var(--p, 0), 1);
+
+  position: relative;
+  /* A phone screen, scaled: the stage is about square, so the height cap is
+     what keeps the whole layout — pill to corner discs — inside it. */
+  width: min(34rem, 100%, 56svh);
+  aspect-ratio: 1 / 1.06;
+  margin-inline: auto;
+  /* the backdrop bleeds past the frame on purpose; keep that bleed off the
+     page's scroll box so the component can never widen its column */
+  overflow: clip;
+  container-type: inline-size;
+  color: var(--ink, #fff);
+  font-family: var(--sans, "Figtree", ui-rounded, "SF Pro Rounded", system-ui, -apple-system, sans-serif);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Every length below is an app point. 1pt = 0.19cqw, so the whole screen
+   scales with the stage and keeps the app's proportions.
+   (cq units are resolved on the children, never on the container itself.) */
+.c-pomodoro .pm-screen {
+  --pt: .19cqw;
+
+  /* the session, in seconds */
+  --tot: 1500;                                   /* 25:00 work length      */
+  --span: 1200;                                  /* elapsed at --p = 1     */
+  --el: calc(var(--_p) * var(--span));
+  --frac: calc((var(--tot) - var(--el)) / var(--tot));   /* ring, continuous */
+  --rem: calc(var(--tot) - round(down, var(--el), 1));   /* clock, whole s  */
+  --mins: calc(round(down, var(--rem) / 60, 1));
+  --secs: calc(var(--rem) - var(--mins) * 60);
+  --m10: calc(round(down, var(--mins) / 10, 1));
+  --m1: calc(var(--mins) - var(--m10) * 10);
+  --s10: calc(round(down, var(--secs) / 10, 1));
+  --s1: calc(var(--secs) - var(--s10) * 10);
+  --has10: clamp(0, calc((var(--mins) - 9.5) * 8), 1);   /* "%d:" drops the 0 */
+
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: calc(10 * var(--pt)) 0 calc(8 * var(--pt));
+}
+
+/* ---------- backdrop: GlassBackdrop, .subtle ---------- */
+/* Each bloom is a closest-side radial, so its alpha reaches zero exactly at
+   its own edges. Keeping those edges within a few percent of the frame means
+   the clip on .c-pomodoro lands where the wash is already invisible — no seam. */
+.c-pomodoro .pm-wash {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: clamp(0, calc(var(--_p) * 10), 1);
+}
+.c-pomodoro .pm-wash i {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+}
+.c-pomodoro .pm-wash i:first-child {
+  left: -4%; top: -4%; width: 108%; height: 80%;
+  background: radial-gradient(closest-side,
+    color-mix(in srgb, var(--acc) 16%, transparent) 0%,
+    color-mix(in srgb, var(--acc) 5%, transparent) 55%,
+    transparent 100%);
+}
+.c-pomodoro .pm-wash i:last-child {
+  right: -4%; bottom: -2%; width: 104%; height: 72%;
+  background: radial-gradient(closest-side,
+    color-mix(in srgb, var(--acc) 11%, transparent) 0%,
+    color-mix(in srgb, var(--acc) 3.5%, transparent) 55%,
+    transparent 100%);
+}
+
+/* ---------- the session-type pill ---------- */
+.c-pomodoro .pm-pill {
+  --in: clamp(0, calc(var(--_p) * 16), 1);
+  display: flex;
+  align-items: center;
+  gap: calc(6 * var(--pt));
+  height: calc(35 * var(--pt));
+  padding: 0 calc(16 * var(--pt)) 0 calc(24 * var(--pt));
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,0) 62%),
+    color-mix(in srgb, var(--acc) 13%, transparent);
+  box-shadow: inset 0 0 0 max(.6px, calc(.7 * var(--pt))) rgba(255,255,255,.10);
+  color: var(--acc);
+  font-size: calc(16 * var(--pt));
+  font-weight: 500;
+  letter-spacing: -.005em;
+  line-height: 1;
+  opacity: var(--in);
+  transform: translateY(calc((1 - var(--in)) * 2.4cqw));
+}
+.c-pomodoro .pm-chev {
+  width: calc(9 * var(--pt));
+  height: auto;
+  opacity: .6;
+  flex: none;
+}
+
+/* ---------- the pinned task chip ---------- */
+.c-pomodoro .pm-task {
+  --in: clamp(0, calc((var(--_p) - .03) * 16), 1);
+  position: relative;
+  overflow: hidden;
+  width: 84%;
+  height: calc(45 * var(--pt));
+  margin-top: calc(14 * var(--pt));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,0) 60%),
+    color-mix(in srgb, var(--acc) 12%, transparent);
+  box-shadow: inset 0 0 0 max(.6px, calc(.7 * var(--pt))) color-mix(in srgb, var(--acc) 20%, transparent);
+  color: color-mix(in srgb, var(--acc) 82%, #fff);
+  font-size: calc(15 * var(--pt));
+  font-weight: 500;
+  letter-spacing: -.005em;
+  white-space: nowrap;
+  opacity: var(--in);
+  transform: translateY(calc((1 - var(--in)) * 2.4cqw));
+}
+/* ambient: a slow sheen crossing the chip, like glass catching the wash */
+.c-pomodoro .pm-task::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg,
+    rgba(255,255,255,0) 38%,
+    rgba(255,255,255,.075) 50%,
+    rgba(255,255,255,0) 62%);
+  background-size: 260% 100%;
+  animation: pm-sheen 11s linear infinite;
+  pointer-events: none;
+}
+@keyframes pm-sheen {
+  0%   { background-position: 160% 0; }
+  60%  { background-position: -60% 0; }
+  100% { background-position: -60% 0; }
+}
+
+/* ---------- the ring ---------- */
+.c-pomodoro .pm-ringwrap {
+  --in: clamp(0, calc((var(--_p) - .015) * 11), 1);
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  margin-top: calc(10 * var(--pt));
+  display: grid;
+  place-items: center;
+}
+.c-pomodoro .pm-ringbox {
+  position: relative;
+  height: 100%;
+  max-height: 100%;
+  max-width: min(100%, 62cqw);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  /* the app scales the ring 0.8 → 1 as the timer starts running */
+  transform: scale(calc(.8 + .2 * var(--in)));
+  opacity: var(--in);
+}
+
+.c-pomodoro .pm-bloom {
+  position: absolute;
+  inset: -13%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side,
+    color-mix(in srgb, var(--acc) 30%, transparent) 0%,
+    color-mix(in srgb, var(--acc) 9%, transparent) 58%,
+    transparent 76%);
+  filter: blur(calc(4 * var(--pt)));
+  opacity: calc(.28 + .5 * var(--frac));
+  animation: pm-breathe 5.4s ease-in-out infinite;
+  pointer-events: none;
+}
+/* transform only — a filter here would replace the blur above outright */
+@keyframes pm-breathe {
+  0%, 100% { transform: scale(.982); }
+  50%      { transform: scale(1.026); }
+}
+
+.c-pomodoro .pm-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.c-pomodoro .pm-ring circle { fill: none; }
+.c-pomodoro .pm-band { stroke-width: 7.2; stroke-linecap: butt; }
+.c-pomodoro .pm-arc {
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - var(--frac));
+}
+.c-pomodoro .pm-glow {
+  stroke: var(--acc);
+  stroke-width: 8.6;
+  opacity: calc(.34 + .3 * var(--frac));
+}
+.c-pomodoro .pm-glowwrap {
+  animation: pm-pulse 5.4s ease-in-out infinite;
+}
+@keyframes pm-pulse {
+  0%, 100% { opacity: .74; }
+  50%      { opacity: 1; }
+}
+.c-pomodoro .pm-base  { stroke: color-mix(in srgb, var(--acc) 22%, transparent); }
+.c-pomodoro .pm-track {
+  stroke: rgba(255,255,255,.085);
+}
+.c-pomodoro .pm-fill  { stroke: var(--acc); }
+.c-pomodoro .pm-rim {
+  stroke: rgba(255,255,255,.11);
+  stroke-width: .5;
+}
+.c-pomodoro .pm-tick { fill: rgba(255,255,255,.40); }
+
+/* ---------- the clock, "%d:%02d" ---------- */
+.c-pomodoro .pm-clock {
+  position: relative;
+  display: flex;
+  /* the digit windows are overflow:hidden, so they synthesise their baseline
+     from the bottom edge — centring the 1em boxes is what actually lines the
+     colon up with the numerals */
+  align-items: center;
+  justify-content: center;
+  font-size: calc(64 * var(--pt));
+  font-weight: 250;
+  letter-spacing: -.015em;
+  line-height: 1;
+  color: var(--acc);
+  font-variant-numeric: tabular-nums;
+}
+.c-pomodoro .pm-d {
+  display: block;
+  width: .58em;
+  height: 1em;
+  overflow: hidden;
+}
+.c-pomodoro .pm-d--tens {
+  width: calc(.58em * var(--has10));
+  opacity: var(--has10);
+}
+.c-pomodoro .pm-strip {
+  display: block;
+  transform: translateY(calc(var(--v) * -1em));
+  will-change: transform;
+}
+.c-pomodoro .pm-strip i {
+  display: block;
+  height: 1em;
+  line-height: 1em;
+  text-align: center;
+  font-style: normal;
+}
+.c-pomodoro .pm-colon {
+  display: block;
+  width: .3em;
+  height: 1em;
+  line-height: 1em;
+  text-align: center;
+  opacity: .85;
+}
+
+/* ---------- pause ---------- */
+.c-pomodoro .pm-pause {
+  --in: clamp(0, calc((var(--_p) - .07) * 16), 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(148 * var(--pt));
+  height: calc(54 * var(--pt));
+  margin-top: calc(10 * var(--pt));
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.085), rgba(255,255,255,.02) 55%, rgba(255,255,255,.045)),
+    rgba(255,255,255,.045);
+  box-shadow:
+    inset 0 0 0 max(.6px, calc(.7 * var(--pt))) rgba(255,255,255,.14),
+    0 calc(2 * var(--pt)) calc(10 * var(--pt)) rgba(0,0,0,.35);
+  color: var(--ink, #fff);
+  font-size: calc(17 * var(--pt));
+  font-weight: 600;
+  letter-spacing: -.005em;
+  line-height: 1;
+  opacity: var(--in);
+  transform: translateY(calc((1 - var(--in)) * 2.4cqw));
+}
+
+/* ---------- the session dots ---------- */
+.c-pomodoro .pm-dots {
+  --in: clamp(0, calc((var(--_p) - .09) * 16), 1);
+  display: flex;
+  align-items: center;
+  gap: calc(8 * var(--pt));
+  margin-top: calc(14 * var(--pt));
+  padding: calc(9 * var(--pt)) calc(14 * var(--pt));
+  border-radius: 999px;
+  background: rgba(255,255,255,.05);
+  box-shadow: inset 0 0 0 max(.6px, calc(.7 * var(--pt))) var(--hairline, rgba(255,255,255,.11));
+  opacity: var(--in);
+  transform: translateY(calc((1 - var(--in)) * 2cqw));
+}
+.c-pomodoro .pm-dot {
+  --din: clamp(0, calc((var(--_p) - .1 - var(--n) * .025) * 14), 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(12 * var(--pt));
+  height: calc(12 * var(--pt));
+  border-radius: 50%;
+  border: max(.7px, calc(1 * var(--pt))) solid color-mix(in srgb, var(--acc) 55%, transparent);
+  font-size: calc(9 * var(--pt));
+  font-weight: 300;
+  line-height: 1;
+  color: var(--ink-2, rgba(255,255,255,.58));
+  opacity: calc(.35 + .65 * var(--din));
+  transform: scale(calc(.7 + .3 * var(--din)));
+}
+/* the session under way */
+.c-pomodoro .pm-dot--now {
+  background: color-mix(in srgb, var(--acc) 26%, transparent);
+  border-color: color-mix(in srgb, var(--acc) 85%, transparent);
+  color: var(--ink, #fff);
+}
+
+/* ---------- tasks / settings ---------- */
+.c-pomodoro .pm-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: calc(16 * var(--pt));
+  padding: 0 calc(22 * var(--pt));
+}
+.c-pomodoro .pm-disc {
+  --in: clamp(0, calc((var(--_p) - .1 - var(--n) * .03) * 14), 1);
+  display: grid;
+  place-items: center;
+  width: calc(50 * var(--pt));
+  height: calc(50 * var(--pt));
+  border-radius: 50%;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.015) 60%),
+    rgba(255,255,255,.04);
+  box-shadow:
+    inset 0 0 0 max(.6px, calc(.7 * var(--pt))) rgba(255,255,255,.12),
+    0 calc(2 * var(--pt)) calc(9 * var(--pt)) rgba(0,0,0,.32);
+  opacity: var(--in);
+  transform: translateY(calc((1 - var(--in)) * 2cqw));
+}
+.c-pomodoro .pm-disc svg {
+  width: calc(21 * var(--pt));
+  height: calc(21 * var(--pt));
+  fill: rgba(255,255,255,.72);
+}
+
+.c-pomodoro .pm-sr {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .c-pomodoro { --_p: 1; }
+  .c-pomodoro *,
+  .c-pomodoro *::before,
+  .c-pomodoro *::after { animation: none !important; }
+  .c-pomodoro .pm-task::after { opacity: 0; }
+}
+</style>
+
+<div class="c-pomodoro">
+  <div class="pm-wash" aria-hidden="true"><i></i><i></i></div>
+
+  <div class="pm-screen">
+
+    <div class="pm-pill">
+      Work
+      <svg class="pm-chev" viewBox="0 0 12 7.4" aria-hidden="true">
+        <path d="M1.3 1.3 6 5.4 10.7 1.3" fill="none" stroke="currentColor"
+              stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <div class="pm-task">Design Pomodoro App</div>
+
+    <div class="pm-ringwrap">
+      <div class="pm-ringbox">
+        <div class="pm-bloom" aria-hidden="true"></div>
+
+        <svg class="pm-ring" viewBox="0 0 100 100" aria-hidden="true">
+          <defs>
+            <filter id="pomodoroRingGlow" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="2.7"/>
+            </filter>
+          </defs>
+          <g transform="rotate(-90 50 50)">
+            <g class="pm-glowwrap" filter="url(#pomodoroRingGlow)">
+              <circle class="pm-band pm-arc pm-glow" cx="50" cy="50" r="46.4" pathLength="1"/>
+            </g>
+            <circle class="pm-band pm-base" cx="50" cy="50" r="46.4"/>
+            <circle class="pm-band pm-track" cx="50" cy="50" r="46.4"/>
+            <circle class="pm-band pm-arc pm-fill" cx="50" cy="50" r="46.4" pathLength="1"/>
+          </g>
+          <circle class="pm-rim" cx="50" cy="50" r="49.75"/>
+          <circle class="pm-rim" cx="50" cy="50" r="43.05"/>
+          <rect class="pm-tick" x="49.55" y="1.1" width=".9" height="5.6" rx=".45"/>
+        </svg>
+
+        <div class="pm-clock" aria-hidden="true">
+          <span class="pm-d pm-d--tens"><span class="pm-strip" style="--v:var(--m10)"><i>0</i><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i><i>7</i><i>8</i><i>9</i></span></span>
+          <span class="pm-d"><span class="pm-strip" style="--v:var(--m1)"><i>0</i><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i><i>7</i><i>8</i><i>9</i></span></span>
+          <span class="pm-colon">:</span>
+          <span class="pm-d"><span class="pm-strip" style="--v:var(--s10)"><i>0</i><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i><i>7</i><i>8</i><i>9</i></span></span>
+          <span class="pm-d"><span class="pm-strip" style="--v:var(--s1)"><i>0</i><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i><i>7</i><i>8</i><i>9</i></span></span>
+        </div>
+        <p class="pm-sr">Work session running, 25 minutes counting down.</p>
+      </div>
+    </div>
+
+    <div class="pm-pause">Pause</div>
+
+    <div class="pm-dots">
+      <span class="pm-dot pm-dot--now" style="--n:0">1</span>
+      <span class="pm-dot" style="--n:1">2</span>
+      <span class="pm-dot" style="--n:2">3</span>
+    </div>
+
+    <div class="pm-bottom">
+      <span class="pm-disc" style="--n:0" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <rect x="2.4" y="3.4" width="19.2" height="7.4" rx="2.2"/>
+          <rect x="2.4" y="13.2" width="19.2" height="7.4" rx="2.2"/>
+        </svg>
+      </span>
+      <span class="pm-disc" style="--n:1" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <g>
+            <rect x="10.55" y="1.7" width="2.9" height="4" rx="1.05"/>
+            <rect x="10.55" y="18.3" width="2.9" height="4" rx="1.05"/>
+            <rect x="10.55" y="1.7" width="2.9" height="4" rx="1.05" transform="rotate(45 12 12)"/>
+            <rect x="10.55" y="18.3" width="2.9" height="4" rx="1.05" transform="rotate(45 12 12)"/>
+            <rect x="10.55" y="1.7" width="2.9" height="4" rx="1.05" transform="rotate(90 12 12)"/>
+            <rect x="10.55" y="18.3" width="2.9" height="4" rx="1.05" transform="rotate(90 12 12)"/>
+            <rect x="10.55" y="1.7" width="2.9" height="4" rx="1.05" transform="rotate(135 12 12)"/>
+            <rect x="10.55" y="18.3" width="2.9" height="4" rx="1.05" transform="rotate(135 12 12)"/>
+          </g>
+          <circle cx="12" cy="12" r="5.5" fill="none" stroke="rgba(255,255,255,.72)" stroke-width="3.1"/>
+        </svg>
+      </span>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,451 @@
+<style>
+/* ------------------------------------------------------------------
+   Apex — Race Home (NextRaceHeroCard + Race Control field)
+   Tokens lifted from FormulaOne/ApexUI/DesignSystem.swift:
+     field ramp  #D40402 #C90301 #5C0603 #2E0403 #160606 #0A0304
+                 at 0 / .22 / .34 / .44 / .56 / .78
+     raceRed (dark)  #FF2800      glassStroke  rgba(255,255,255,.14)
+     inkTertiary     #9C998F      inkSecondary #CBC8C2
+     Radius.card 14pt on a 329pt card  ->  ~1.5rem here
+   Circuit geometry is the app's own pipeline run offline over
+   ApexCore/Resources/circuits.geojson (nl-1948, Zandvoort):
+   equirectangular projection -> unit box -> RDP simplify 0.0015 ->
+   oriented clockwise -> 720-sample curvature corner detection ->
+   straight-run fit for the two 2025 DRS zones.
+   ------------------------------------------------------------------ */
+
+.c-apex {
+  --ax-p: var(--p, 1);                      /* never shadows the ancestor */
+  --ax-red: #FF2800;                        /* DS.Colors.raceRed, dark */
+  --ax-edge: rgba(255, 255, 255, .14);      /* DS.Colors.glassStroke, dark */
+  --ax-draw: clamp(0, calc(var(--ax-p) / .44), 1);
+  --ax-zone: clamp(0, calc((var(--ax-p) - .44) * 7), 1);
+
+  container-type: inline-size;
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  max-width: 34rem;
+  margin-inline: auto;
+  /* the app's card is a phone screen, not a square: hold that proportion so
+     the near-square circuit fills the map instead of floating in it */
+  aspect-ratio: .82;
+  max-height: 100%;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- the field: Race Control's red-to-black ground ---------------- */
+.c-apex .ax-field {
+  position: absolute;
+  /* no horizontal bleed: an absolutely positioned box hung outside the
+     component still counts as layout overflow and scrolls the page on a
+     narrow screen. The wash is faded out by its own mask instead. */
+  inset: -8% 0 -6%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(78% 42% at 50% -4%, rgba(255, 92, 64, .55), rgba(255, 92, 64, 0) 72%),
+    radial-gradient(126% 82% at 50% -14%, rgba(0, 0, 0, 0) 26%, rgba(0, 0, 0, .44) 100%),
+    linear-gradient(180deg,
+      var(--accent) 0%,
+      var(--accent) 20%,
+      #5C0603 34%,
+      #2E0403 44%,
+      #160606 56%,
+      #0A0304 78%,
+      #000 100%);
+  /* fades on all four sides inside the box, so the ground has no hard edge */
+  -webkit-mask-image: radial-gradient(52% 108% at 50% 0%, #000 44%, rgba(0, 0, 0, 0) 100%);
+          mask-image: radial-gradient(52% 108% at 50% 0%, #000 44%, rgba(0, 0, 0, 0) 100%);
+}
+
+/* ---- stack -------------------------------------------------------- */
+.c-apex .ax-stack {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: .85em;
+  padding: .9em .55em 0;
+  font-family: var(--sans);
+  font-size: clamp(.68rem, 2.86cqw, .95rem);
+  line-height: 1.25;
+}
+
+/* ---- top bar: the round red glass settings button ----------------- */
+.c-apex .ax-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.c-apex .ax-gear {
+  width: 2.55em;
+  height: 2.55em;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, .88);
+  background:
+    radial-gradient(120% 120% at 30% 12%, rgba(255, 255, 255, .20), rgba(255, 255, 255, 0) 62%),
+    color-mix(in srgb, var(--accent) 55%, rgba(0, 0, 0, .35));
+  box-shadow:
+    inset 0 0 0 1px var(--ax-edge),
+    inset 0 .06em .5em rgba(255, 255, 255, .14),
+    0 .3em 1.2em rgba(255, 40, 0, .28);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
+          backdrop-filter: blur(12px) saturate(1.2);
+  opacity: clamp(0, calc(var(--ax-p) * 12), 1);
+  transform: scale(calc(.86 + .14 * clamp(0, calc(var(--ax-p) * 9), 1)));
+}
+.c-apex .ax-gear svg { width: 1.18em; height: 1.18em; display: block; }
+
+/* ---- the hero card ------------------------------------------------ */
+.c-apex .ax-card {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  background:
+    linear-gradient(168deg,
+      rgba(255, 40, 0, .26) 0%,
+      rgba(150, 14, 10, .20) 26%,
+      rgba(22, 6, 6, .62) 62%,
+      rgba(10, 3, 4, .82) 100%);
+  box-shadow: inset 0 0 0 1px var(--ax-edge);
+  -webkit-backdrop-filter: blur(22px) saturate(1.15);
+          backdrop-filter: blur(22px) saturate(1.15);
+}
+
+/* ---- the neon track map ------------------------------------------- */
+.c-apex .ax-map {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 7.5em;
+  padding: 1.05em 1em .45em;
+}
+.c-apex .ax-map svg { width: 100%; height: 100%; display: block; overflow: visible; }
+
+/* the veil that sinks the stroke into the card (DS surfaceFade) */
+.c-apex .ax-map::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg,
+    rgba(10, 3, 4, 0) 0%,
+    rgba(10, 3, 4, 0) 74%,
+    rgba(10, 3, 4, .55) 100%);
+}
+
+.c-apex .ax-ghost {
+  fill: none;
+  stroke: rgba(255, 255, 255, .13);
+  stroke-width: 17;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: calc(clamp(0, calc(var(--ax-p) * 16), 1) * .9);
+}
+
+.c-apex .ax-line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: calc(1 - var(--ax-draw));
+}
+.c-apex .ax-line--emberglow { stroke: var(--ax-red); stroke-width: 30; opacity: .38; filter: url(#axBlurWide); }
+.c-apex .ax-line--glow      { stroke: #fff;          stroke-width: 21; opacity: .48; filter: url(#axBlurSoft); }
+.c-apex .ax-line--core      { stroke: #fff;          stroke-width: 19; }
+
+/* the comet: a short dash pinned to the drawing head */
+.c-apex .ax-head {
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: .055 1;
+  stroke-dashoffset: calc(.055 - var(--ax-draw));
+  opacity: calc(1 - clamp(0, calc((var(--ax-draw) - .82) * 5.6), 1));
+}
+.c-apex .ax-head--halo { stroke: #fff; stroke-width: 44; opacity: calc((1 - clamp(0, calc((var(--ax-draw) - .82) * 5.6), 1)) * .5); filter: url(#axBlurWide); }
+.c-apex .ax-head--tip  { stroke: #fff; stroke-width: 22; filter: url(#axBlurTight); }
+
+/* ---- overtaking zones (2025 DRS: T13→T1 main straight, T10→T11) ---- */
+.c-apex .ax-zones { opacity: var(--ax-zone); }
+.c-apex .ax-zone {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.c-apex .ax-zone--spread { stroke: var(--ax-red); stroke-width: 58; opacity: .34; filter: url(#axBlurWide); animation: ax-breathe 4.6s ease-in-out infinite; }
+.c-apex .ax-zone--core   { stroke: var(--ax-red); stroke-width: 38; opacity: .46; }
+
+@keyframes ax-breathe { 0%, 100% { opacity: .26 } 50% { opacity: .46 } }
+
+/* ---- annotations --------------------------------------------------- */
+.c-apex .ax-anno { --ax-a: clamp(0, calc((var(--ax-p) - .45 - var(--n) * .017) * 13), 1); }
+.c-apex .ax-num {
+  font-family: var(--sans);
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  fill: #9C998F;               /* DS.Colors.inkTertiary, dark */
+  text-anchor: middle;
+  dominant-baseline: central;
+  opacity: var(--ax-a);
+}
+.c-apex .ax-sf   { fill: var(--ax-red); opacity: var(--ax-a); }
+.c-apex .ax-arrow { fill: #CBC8C2; opacity: calc(var(--ax-a) * .9); }
+
+/* ---- copy block ---------------------------------------------------- */
+.c-apex .ax-body { flex: 0 0 auto; padding: 0 1.1em 1.05em; }
+
+.c-apex .ax-in {
+  opacity: clamp(0, calc((var(--ax-p) - .40 - var(--n) * .046) * 9), 1);
+  transform: translateY(calc(.72em * (1 - clamp(0, calc((var(--ax-p) - .40 - var(--n) * .046) * 9), 1))));
+}
+
+.c-apex .ax-meta {
+  display: flex;
+  align-items: center;
+  gap: .5em;
+  font-size: .74em;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  margin: 0 0 .34em;
+}
+.c-apex .ax-round { color: rgba(255, 255, 255, .93); }
+.c-apex .ax-country { color: var(--ink-2); }
+
+/* Netherlands — real flag colours, not the app tint */
+.c-apex .ax-flag {
+  width: 1.55em;
+  height: 1.06em;
+  border-radius: .17em;
+  flex: 0 0 auto;
+  background: linear-gradient(180deg, #AE1C28 0 33.34%, #FFF 33.34% 66.67%, #21468B 66.67% 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .34);   /* DS.Colors.flagEdge */
+}
+
+.c-apex .ax-name {
+  margin: 0;
+  font-size: 1.72em;
+  font-weight: 800;
+  letter-spacing: .012em;
+  line-height: 1.03;
+  color: var(--ink);
+}
+
+.c-apex .ax-dates {
+  margin: .34em 0 0;
+  font-size: .8em;
+  color: var(--ink-2);
+}
+
+.c-apex .ax-count {
+  position: relative;
+  margin: .5em 0 0;
+  display: flex;
+  align-items: baseline;
+  gap: .5em;
+  flex-wrap: wrap;
+}
+.c-apex .ax-clock {
+  font-family: var(--mono);
+  font-size: 1.95em;
+  font-weight: 400;
+  letter-spacing: -.022em;
+  line-height: 1.05;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.c-apex .ax-to { font-size: .8em; color: var(--ink-2); }
+
+/* the odometer: one digit per ramp, discrete because the ramps are steep */
+.c-apex .ax-dg { position: relative; display: inline-block; }
+.c-apex .ax-dg > b { font-weight: inherit; visibility: hidden; }
+.c-apex .ax-dg > i {
+  position: absolute;
+  inset: 0;
+  font-style: normal;
+  opacity: calc(
+    clamp(0, calc((var(--ax-p) - var(--a)) * 400), 1) -
+    clamp(0, calc((var(--ax-p) - var(--b)) * 400), 1)
+  );
+}
+
+.c-apex .ax-rule {
+  height: 1px;
+  margin: .82em 0 .68em;
+  background: var(--hairline);
+  transform-origin: left center;
+  transform: scaleX(clamp(0, calc((var(--ax-p) - .60) * 5), 1));
+}
+
+.c-apex .ax-stats { display: flex; align-items: flex-start; }
+.c-apex .ax-stat {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  padding-inline: .9em;
+}
+.c-apex .ax-stat:first-child { padding-inline-start: 0; }
+.c-apex .ax-stat:last-child  { padding-inline-end: 0; }
+.c-apex .ax-stat + .ax-stat::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: .12em;
+  width: 1px;
+  height: 2.55em;
+  background: var(--hairline);
+  transform-origin: top center;
+  transform: scaleY(clamp(0, calc((var(--ax-p) - .66) * 7), 1));
+}
+.c-apex .ax-k {
+  display: block;
+  font-size: .76em;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.c-apex .ax-v {
+  display: block;
+  margin-top: .12em;
+  font-family: var(--mono);
+  font-size: .95em;
+  font-weight: 600;
+  letter-spacing: -.03em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.c-apex .ax-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .c-apex { --ax-p: 1; }
+  .c-apex .ax-zone--spread { animation: none; opacity: .34; }
+}
+</style>
+
+<div class="c-apex">
+  <div class="ax-field" aria-hidden="true"></div>
+
+  <div class="ax-stack">
+
+    <div class="ax-bar" aria-hidden="true">
+      <div class="ax-gear">
+        <svg viewBox="-14 -14 28 28" fill="none">
+          <path d="M 10.01,-1.95 L 10.01,1.95 L 6.97,2.49 L 6.69,3.17 L 8.46,5.70 L 5.70,8.46 L 3.17,6.69 L 2.49,6.97 L 1.95,10.01 L -1.95,10.01 L -2.49,6.97 L -3.17,6.69 L -5.70,8.46 L -8.46,5.70 L -6.69,3.17 L -6.97,2.49 L -10.01,1.95 L -10.01,-1.95 L -6.97,-2.49 L -6.69,-3.17 L -8.46,-5.70 L -5.70,-8.46 L -3.17,-6.69 L -2.49,-6.97 L -1.95,-10.01 L 1.95,-10.01 L 2.49,-6.97 L 3.17,-6.69 L 5.70,-8.46 L 8.46,-5.70 L 6.69,-3.17 L 6.97,-2.49 Z"
+                stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/>
+          <circle r="3.9" stroke="currentColor" stroke-width="1.9"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="ax-card">
+
+      <div class="ax-map" aria-hidden="true">
+        <svg viewBox="-42 -94 1094 1034" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <filter id="axBlurWide"  x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="22"/></filter>
+            <filter id="axBlurSoft"  x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="11"/></filter>
+            <filter id="axBlurTight" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="7"/></filter>
+            <path id="axLap" pathLength="1" d="M 122.1,389.4 L 276.8,19.0 L 286.5,8.0 L 299.5,1.8 L 313.8,0.0 L 327.0,2.7 L 339.4,11.2 L 348.1,21.9 L 352.7,35.1 L 353.0,49.9 L 305.1,165.1 L 293.7,205.4 L 289.1,247.4 L 291.5,286.8 L 287.8,302.8 L 279.1,313.5 L 261.6,327.7 L 190.9,355.4 L 177.6,365.5 L 173.5,393.8 L 178.9,407.4 L 188.9,417.1 L 201.5,422.2 L 220.8,421.8 L 315.8,391.5 L 359.9,383.2 L 398.0,382.0 L 431.7,384.5 L 463.5,389.9 L 523.4,404.7 L 557.7,407.7 L 611.2,395.0 L 646.4,377.3 L 687.8,350.3 L 715.8,337.0 L 740.7,329.8 L 773.6,326.1 L 799.5,326.7 L 907.5,333.3 L 932.5,339.1 L 955.6,350.6 L 972.0,364.7 L 992.8,396.8 L 998.3,416.6 L 1000.0,437.6 L 998.0,458.1 L 992.0,478.9 L 979.0,501.5 L 929.4,569.3 L 911.1,599.4 L 869.6,689.0 L 849.7,696.0 L 825.1,698.8 L 801.6,697.7 L 773.9,693.0 L 745.1,683.1 L 714.3,668.4 L 683.8,646.6 L 664.9,625.7 L 661.5,612.9 L 664.5,599.4 L 676.2,582.4 L 693.0,571.7 L 717.6,562.6 L 759.8,556.0 L 800.3,545.8 L 837.3,531.6 L 857.8,517.2 L 865.6,499.9 L 866.6,481.1 L 860.0,462.3 L 842.9,445.2 L 827.5,439.9 L 747.7,430.1 L 667.3,430.4 L 581.9,440.7 L 509.7,458.9 L 415.7,491.2 L 368.5,511.3 L 316.0,540.1 L 306.0,538.2 L 286.5,506.1 L 272.6,497.5 L 254.9,496.9 L 237.6,505.0 L 228.4,517.4 L 224.1,530.8 L 267.1,784.0 L 267.9,799.1 L 263.6,814.5 L 250.2,835.9 L 233.7,847.0 L 216.2,851.0 L 126.8,851.5 L 104.7,848.0 L 81.8,840.6 L 63.1,832.0 L 38.1,812.3 L 10.7,771.9 L 2.6,746.8 L 0.0,724.7 L 2.3,688.6 L 9.1,663.0 L 122.1,389.4 Z"/>
+          </defs>
+
+          <!-- ghost of the full lap -->
+          <use href="#axLap" class="ax-ghost"/>
+
+          <!-- overtaking zones, bedded under the line -->
+          <g class="ax-zones">
+            <path class="ax-zone ax-zone--spread" d="M 15.4,648.0 L 122.1,389.4 L 267.4,41.5"/>
+            <path class="ax-zone ax-zone--spread" d="M 654.3,431.9 L 587.9,439.9"/>
+            <path class="ax-zone ax-zone--core"   d="M 15.4,648.0 L 122.1,389.4 L 267.4,41.5"/>
+            <path class="ax-zone ax-zone--core"   d="M 654.3,431.9 L 587.9,439.9"/>
+          </g>
+
+          <!-- the drawn stroke: red under-glow, white bloom, flat core -->
+          <use href="#axLap" class="ax-line ax-line--emberglow"/>
+          <use href="#axLap" class="ax-line ax-line--glow"/>
+          <use href="#axLap" class="ax-line ax-line--core"/>
+
+          <!-- the drawing head -->
+          <use href="#axLap" class="ax-head ax-head--halo"/>
+          <use href="#axLap" class="ax-head ax-head--tip"/>
+
+          <!-- start/finish tick + direction of travel -->
+          <g class="ax-anno" style="--n:0">
+            <rect class="ax-sf" x="-9" y="-40" width="18" height="80" rx="7"
+                  transform="translate(122.1,389.4) rotate(-67.33)"/>
+          </g>
+          <g class="ax-anno" style="--n:1">
+            <path class="ax-arrow" d="M -13,-15 L 17,0 L -13,15 Z"
+                  transform="translate(172.8,268.2) rotate(-67.33)"/>
+          </g>
+
+          <!-- named corners (the app collapses to these below a 260pt map) -->
+          <g class="ax-anno" style="--n:2"><text class="ax-num" x="315.1" y="-61.8">1</text></g>
+          <g class="ax-anno" style="--n:3"><text class="ax-num" x="217.2" y="244.4">2</text></g>
+          <g class="ax-anno" style="--n:4"><text class="ax-num" x="243.4" y="282.5">3</text></g>
+          <g class="ax-anno" style="--n:5"><text class="ax-num" x="130.5" y="445.7">4</text></g>
+          <g class="ax-anno" style="--n:6"><text class="ax-num" x="352.0" y="321.8">5</text></g>
+          <g class="ax-anno" style="--n:7"><text class="ax-num" x="695.8" y="278.3">7</text></g>
+          <g class="ax-anno" style="--n:8"><text class="ax-num" x="990.3" y="299.3">8</text></g>
+          <g class="ax-anno" style="--n:9"><text class="ax-num" x="593.2" y="501.6">11</text></g>
+          <g class="ax-anno" style="--n:10"><text class="ax-num" x="291.3" y="598.1">12</text></g>
+          <g class="ax-anno" style="--n:11"><text class="ax-num" x="-6.9" y="855.0">14</text></g>
+        </svg>
+      </div>
+
+      <div class="ax-body">
+        <p class="ax-meta ax-in" style="--n:0">
+          <span class="ax-round">Round 12</span>
+          <span class="ax-flag" aria-hidden="true"></span>
+          <span class="ax-country">Netherlands</span>
+        </p>
+
+        <h3 class="ax-name ax-in" style="--n:1">Dutch Grand Prix</h3>
+
+        <p class="ax-dates ax-in" style="--n:2">21–23 Aug 2026</p>
+
+        <p class="ax-count ax-in" style="--n:3">
+          <span class="ax-sr">5 days 17 hours 6 minutes to Practice 1</span>
+          <span class="ax-clock" aria-hidden="true">5d 17:06:<span class="ax-dg"><b>0</b><i style="--a:-1;--b:.868">5</i><i style="--a:.868;--b:2">4</i></span><span class="ax-dg"><b>0</b><i style="--a:-1;--b:.604">6</i><i style="--a:.604;--b:.648">5</i><i style="--a:.648;--b:.692">4</i><i style="--a:.692;--b:.736">3</i><i style="--a:.736;--b:.780">2</i><i style="--a:.780;--b:.824">1</i><i style="--a:.824;--b:.868">0</i><i style="--a:.868;--b:.912">9</i><i style="--a:.912;--b:.956">8</i><i style="--a:.956;--b:2">7</i></span></span>
+          <span class="ax-to" aria-hidden="true">to Practice 1</span>
+        </p>
+
+        <div class="ax-rule" aria-hidden="true"></div>
+
+        <div class="ax-stats">
+          <div class="ax-stat ax-in" style="--n:5">
+            <span class="ax-k">Length</span>
+            <span class="ax-v">4.259 km</span>
+          </div>
+          <div class="ax-stat ax-in" style="--n:6">
+            <span class="ax-k">Corners</span>
+            <span class="ax-v">14</span>
+          </div>
+          <div class="ax-stat ax-in" style="--n:7">
+            <span class="ax-k">Lap record</span>
+            <span class="ax-v">1:11.097</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

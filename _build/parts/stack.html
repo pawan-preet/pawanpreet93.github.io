@@ -1,0 +1,683 @@
+<style>
+/* ==========================================================================
+   Stack — Today · Tracking · Experiments, three stages cross-faded by --p.
+   Tokens lifted from BioExperiment/BioExperiment/DesignSystem/DesignSystem.swift
+   (chartPalette / auraPalette dark values, Radius.section 28, positive #57C98A,
+   destructive #FF6B5E) and the screens that draw them.
+   ========================================================================== */
+
+.c-stack{
+  container-type: inline-size;
+  width: 100%;
+  max-width: 34rem;
+  margin-inline: auto;
+}
+
+.c-stack *{ box-sizing: border-box; }
+
+/* --- the frame ---------------------------------------------------------- */
+.c-stack .st{
+  --pp: clamp(0, var(--p, 0), 1);
+  /* stage hand-offs. The outgoing screen leaves just before the next arrives, so
+     the swap reads as a hand-off rather than two screens printed over each other. */
+  --o1: clamp(0, calc((var(--pp) - .28) * 22), 1);
+  --i2: clamp(0, calc((var(--pp) - .305) * 22), 1);
+  --o2: clamp(0, calc((var(--pp) - .61) * 22), 1);
+  --i3: clamp(0, calc((var(--pp) - .635) * 22), 1);
+  --x1: var(--o1);
+  --a1: calc(1 - var(--o1));
+  --a2: calc(var(--i2) - var(--o2));
+  --a3: var(--i3);
+
+  /* chart palette (dark) — the colour each tracked thing owns */
+  --c-creatine:#BBA8FF;   /* lavender */
+  --c-mag:#A9D27E;        /* sage     */
+  --c-omega:#CDA8EF;      /* lilac    */
+  --c-d3:#F4D169;         /* butter   */
+  --c-cold:#72D7CF;       /* teal     */
+  /* aura palette (dark) — the muted disc behind a Today icon */
+  --d-creatine:#6E5FA0;
+  --d-mag:#7E9A5E;
+  --d-omega:#8E6FA8;
+  --d-d3:#B09A52;
+  --d-cold:#4A9690;
+  /* per-tab aura hues */
+  --au-today:#8E6FA8;
+  --au-track:#6E5FA0;
+  --au-exp:#4E7CA8;
+
+  --pos:#57C98A;
+  --neg:#FF6B5E;
+  --r-section: 1.7em;      /* DS.Radius.section 28pt */
+  --r-card: 2.05em;        /* section + 6, the experiment card */
+
+  position: relative;
+  aspect-ratio: 1 / 1.06;
+  max-height: 100%;
+  overflow: hidden;
+  border-radius: 1.2em;
+  font-family: var(--sans);
+  font-size: clamp(9px, 2.85cqw, 14px);
+  line-height: 1.25;
+  color: var(--ink);
+  isolation: isolate;
+}
+
+/* --- aura ---------------------------------------------------------------- */
+.c-stack .st-bg{ position:absolute; inset:0; z-index:0; pointer-events:none; }
+.c-stack .st-bg::before{
+  content:"";
+  position:absolute; inset:0;
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--accent) 34%, transparent) 0%,
+      color-mix(in srgb, var(--accent) 10%, transparent) 46%,
+      transparent 88%);
+}
+.c-stack .st-aura{
+  position:absolute; inset:-14%;
+  animation: st-drift 26s ease-in-out infinite alternate;
+}
+.c-stack .st-aura--1{
+  opacity: var(--a1);
+  background:
+    radial-gradient(38% 30% at 18% 14%, color-mix(in srgb, var(--au-today) 62%, transparent), transparent 70%),
+    radial-gradient(34% 27% at 86% 42%, color-mix(in srgb, var(--au-today) 44%, transparent), transparent 70%),
+    radial-gradient(40% 32% at 42% 82%, color-mix(in srgb, var(--au-today) 50%, transparent), transparent 70%);
+}
+.c-stack .st-aura--2{
+  opacity: var(--a2);
+  animation-duration: 31s;
+  background:
+    radial-gradient(38% 30% at 22% 20%, color-mix(in srgb, var(--au-track) 60%, transparent), transparent 70%),
+    radial-gradient(34% 27% at 84% 48%, color-mix(in srgb, var(--au-track) 46%, transparent), transparent 70%),
+    radial-gradient(40% 32% at 46% 86%, color-mix(in srgb, var(--au-track) 48%, transparent), transparent 70%);
+}
+.c-stack .st-aura--3{
+  opacity: var(--a3);
+  animation-duration: 37s;
+  background:
+    radial-gradient(38% 30% at 16% 18%, color-mix(in srgb, var(--au-exp) 62%, transparent), transparent 70%),
+    radial-gradient(36% 28% at 88% 38%, color-mix(in srgb, var(--au-exp) 46%, transparent), transparent 70%),
+    radial-gradient(42% 33% at 40% 84%, color-mix(in srgb, var(--au-exp) 52%, transparent), transparent 70%);
+}
+@keyframes st-drift{
+  from{ transform: translate3d(-1.2%, -1%, 0) scale(1); }
+  to  { transform: translate3d(1.4%, 1.6%, 0) scale(1.06); }
+}
+
+/* --- a screen ------------------------------------------------------------ */
+.c-stack .st-screen{
+  position:absolute; inset:0; z-index:1;
+  display:flex; flex-direction:column;
+  padding: 1.3em 1.1em 0;
+  will-change: opacity, transform;
+}
+.c-stack .st-screen--today{
+  opacity: var(--a1);
+  --sp: clamp(0, calc(var(--pp) * 6), 1);
+  transform: translateY(calc(var(--x1) * -2.1em)) scale(calc(1 - var(--x1) * .04));
+  -webkit-mask-image: linear-gradient(180deg, #000 78%, transparent 99%);
+  mask-image: linear-gradient(180deg, #000 78%, transparent 99%);
+}
+.c-stack .st-screen--track{
+  opacity: var(--a2);
+  --sp: clamp(0, calc((var(--pp) - .30) * 6), 1);
+  transform: translateY(calc((1 - var(--i2)) * 2.1em + var(--o2) * -2.1em))
+             scale(calc(1 - (1 - var(--i2)) * .04 - var(--o2) * .04));
+}
+.c-stack .st-screen--exp{
+  opacity: var(--a3);
+  --sp: clamp(0, calc((var(--pp) - .63) * 6), 1);
+  transform: translateY(calc((1 - var(--i3)) * 2.1em)) scale(calc(1 - (1 - var(--i3)) * .04));
+}
+.c-stack .st-screen--exp .st-flow{ gap:.7em; padding-bottom:3.5em; }
+
+/* every staggered child settles from its own ramp off the stage progress */
+.c-stack .st-flow > *{
+  --r: clamp(0, calc((var(--sp) - var(--n, 0) * .075) * 3.2), 1);
+  --rr: clamp(0, calc((var(--sp) - var(--n, 0) * .075 - .07) * 2.4), 1);
+  flex: 0 0 auto;
+  opacity: var(--r);
+  transform: translateY(calc((1 - var(--r)) * .9em));
+}
+
+/* --- header -------------------------------------------------------------- */
+.c-stack .st-head{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:.6em; margin-bottom:.8em; flex:0 0 auto;
+}
+/* Bebas Neue via --display. Typeface.swift reserves that face for tab-root and
+   pushed screen headers ALONE — DS.Fonts.display — so these three titles are the
+   one place in the app it appears. Single-weight, hence 400: asking for 800 got a
+   synthetic bold of the wrong face entirely. Tracking is DSScreenHeader's 1pt at
+   26pt. The colour is DS.Colors.accent, which resolves to the label colour. */
+.c-stack .st-title{
+  margin:0;
+  font-family: var(--display);
+  font-weight:400;
+  font-size:1.95em;
+  line-height:1;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  color:var(--ink);
+}
+/* glassBackground(in: Circle()) — the add button is a glass disc, not a bare glyph */
+.c-stack .st-plus{
+  width:1.6em; height:1.6em; flex:0 0 auto;
+  display:grid; place-items:center;
+  border-radius:50%;
+  background:rgba(255,255,255,.075);
+  border:1px solid rgba(255,255,255,.20);
+  -webkit-backdrop-filter: blur(13px) saturate(1.6);
+  backdrop-filter: blur(13px) saturate(1.6);
+  color:var(--ink);
+}
+.c-stack .st-plus svg{ width:.95em; height:.95em; }
+
+/* --- flow / section labels ---------------------------------------------- */
+.c-stack .st-flow{
+  display:flex; flex-direction:column; gap:.6em;
+  flex:1 1 auto; min-height:0;
+}
+.c-stack .st-label{
+  margin:0;
+  font-size:.85em;
+  letter-spacing:.135em;              /* SectionLabel tracking 1.6pt */
+  text-transform:uppercase;
+  color:var(--ink-2);
+  padding-left:.3em;
+}
+.c-stack .st-labelrow{
+  display:flex; align-items:baseline; justify-content:space-between;
+  gap:.6em; padding-left:.3em; padding-right:.3em;
+}
+.c-stack .st-labelrow .st-label{ padding-left:0; }
+.c-stack .st-count{
+  font-family: var(--mono);
+  font-size:.76em;
+  color:var(--ink-3);
+}
+.c-stack .st-logged{ font-size:.82em; color:var(--ink-3); }
+.c-stack .st-gap{ margin-top:.9em; }
+
+/* --- glass ---------------------------------------------------------------- */
+.c-stack .st-card{
+  position:relative;
+  border-radius:var(--r-section);
+  background:linear-gradient(180deg, rgba(255,255,255,.085), rgba(255,255,255,.042));
+  border:1px solid rgba(255,255,255,.16);
+  -webkit-backdrop-filter: blur(13px) saturate(1.6);
+  backdrop-filter: blur(13px) saturate(1.6);
+}
+
+/* --- Today: a dose row --------------------------------------------------- */
+.c-stack .st-dose{
+  display:flex; align-items:center; gap:.8em;
+  min-height:4.15em;
+  padding:.5em .55em .5em 1.05em;
+}
+.c-stack .st-disc{
+  flex:0 0 auto;
+  width:2.55em; height:2.55em;
+  display:grid; place-items:center;
+  border-radius:50%;
+  background: color-mix(in srgb, var(--d) 35%, transparent);
+  color:var(--ink);
+}
+.c-stack .st-disc svg{ width:1.15em; height:1.15em; }
+.c-stack .st-dose-txt{ display:flex; flex-direction:column; gap:.18em; min-width:0; }
+.c-stack .st-name{
+  font-size:1.2em; font-weight:400; color:var(--ink);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.c-stack .st-sub{
+  font-size:.86em; color:var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  /* nowrap needs somewhere to go: at 360px the dose text column shrinks, and
+     without this "1000 mg 40 MIN LATE" runs out under the tick instead of cutting. */
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.c-stack .st-late{
+  font-style:normal; font-weight:500; font-size:.86em;
+  letter-spacing:.06em; text-transform:uppercase;
+  color:var(--neg); margin-left:.5em;
+}
+.c-stack .st-tick{
+  flex:0 0 auto; margin-left:auto;
+  width:1.55em; height:1.55em;
+  border-radius:50%;
+  background:rgba(255,255,255,.10);
+  border:.1em solid rgba(255,255,255,.30);
+}
+.c-stack .st-tick--on{
+  border-color: color-mix(in srgb, var(--pos) 55%, transparent);
+  background: color-mix(in srgb, var(--pos) 20%, transparent);
+  display:grid; place-items:center;
+}
+.c-stack .st-tick--on svg{ width:.8em; height:.8em; color:var(--pos); }
+
+/* --- Tracking: rows in one glass section --------------------------------- */
+.c-stack .st-list{ padding:0 1.15em; }
+.c-stack .st-row{
+  display:flex; align-items:flex-start; gap:.8em;
+  padding:.8em 0;
+}
+.c-stack .st-row + .st-row{ border-top:1px solid var(--hairline); }
+.c-stack .st-idisc{
+  flex:0 0 auto;
+  width:2.05em; height:2.05em;
+  display:grid; place-items:center;
+  border-radius:50%;
+  background: color-mix(in srgb, var(--t) 15%, transparent);
+  color:var(--t);
+}
+.c-stack .st-idisc svg{ width:.98em; height:.98em; }
+.c-stack .st-rowbody{ flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:.3em; }
+.c-stack .st-rowtop{ display:flex; align-items:baseline; gap:.6em; }
+.c-stack .st-rowname{ font-size:1.05em; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.c-stack .st-pct{
+  margin-left:auto;
+  font-size:.75em; color:var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.c-stack .st-rowsub{ font-size:.82em; color:var(--ink-2); }
+.c-stack .st-chev{ flex:0 0 auto; width:.6em; margin-top:.45em; color:var(--ink-3); }
+.c-stack .st-chev svg{ width:100%; height:auto; display:block; }
+
+/* the adherence strip — 42 days, oldest at the leading edge */
+.c-stack .st-strip{
+  display:flex; gap:.14em; align-items:stretch;
+  height:1em; margin-top:.15em;
+  clip-path: inset(0 calc((1 - var(--rr, 1)) * 100%) 0 0);
+}
+.c-stack .st-strip i{
+  flex:1 1 0; min-width:0;
+  border-radius:99px;
+  background:var(--t);
+}
+.c-stack .st-strip i.o{ opacity:.22; }
+
+/* --- Experiments --------------------------------------------------------- */
+.c-stack .st-exp{
+  border-radius:var(--r-card);
+  padding:1.1em 1.25em 1em;
+  overflow:hidden;
+}
+.c-stack .st-mark{
+  position:absolute;
+  right:-1.4em; bottom:-2.2em;
+  width:11em; height:11em;
+  color:var(--t);
+  opacity:.07;
+  transform: rotate(-12deg);
+  pointer-events:none;
+}
+.c-stack .st-mark svg{ width:100%; height:100%; display:block; }
+.c-stack .st-exp > :not(.st-mark){ position:relative; z-index:1; }
+.c-stack .st-exptitle{ font-size:1.15em; color:var(--ink); }
+.c-stack .st-verdict{
+  display:block;
+  margin-top:.45em;
+  font-size:1.8em; line-height:1.1; font-weight:400;
+  color:var(--pos);
+}
+.c-stack .st-scale{ margin-top:.7em; }
+.c-stack .st-track{
+  position:relative;
+  height:.8em;
+  border-radius:99px;
+  background:rgba(255,255,255,.10);
+}
+.c-stack .st-fill{
+  position:absolute; left:50%; top:0; bottom:0;
+  width: calc(var(--mag) * var(--rr, 1) * 50%);
+  border-radius:0 .4em .4em 0;
+  background: color-mix(in srgb, var(--pos) 90%, transparent);
+}
+.c-stack .st-datum{
+  position:absolute; left:calc(50% - .07em); top:-.2em; bottom:-.2em;
+  width:.14em; border-radius:99px;
+  background:rgba(255,255,255,.45);
+}
+.c-stack .st-ends{
+  display:flex; align-items:baseline; gap:.6em;
+  margin-top:.5em;
+  font-size:.74em; color:var(--ink-2);
+}
+.c-stack .st-ends .st-polarity{ margin-inline:auto; color:var(--ink-3); }
+.c-stack .st-sentence{
+  margin:.7em 0 0;
+  font-size:1em; line-height:1.35; color:var(--ink-2);
+}
+.c-stack .st-evidence{
+  margin:.5em 0 0;
+  font-size:.8em; color:var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.c-stack .st-evidence b{ font-family:var(--mono); font-weight:400; }
+
+/* --- tab bar -------------------------------------------------------------- */
+.c-stack .st-tabbar{
+  position:absolute; z-index:2;
+  left:50%; bottom:1.1em;
+  transform:translateX(-50%);
+  width:min(14em, 78%);
+  display:flex; align-items:center;
+  padding:.32em;
+  border-radius:99px;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.14);
+  -webkit-backdrop-filter: blur(16px) saturate(1.5);
+  backdrop-filter: blur(16px) saturate(1.5);
+}
+.c-stack .st-tabsel{
+  position:absolute;
+  left:.32em; top:.32em; bottom:.32em;
+  width:calc((100% - .64em) / 3);
+  border-radius:99px;
+  background: color-mix(in srgb, var(--accent) 46%, rgba(255,255,255,.10));
+  transform: translateX(calc((var(--o1) + var(--o2)) * 100%));
+}
+.c-stack .st-tab{
+  position:relative;
+  flex:1 1 0;
+  display:grid; place-items:center;
+  padding:.42em 0;
+  color:var(--ink);
+}
+.c-stack .st-tab svg{ width:1.35em; height:1.35em; display:block; }
+.c-stack .st-tab--1{ opacity: calc(.34 + .66 * var(--a1)); }
+.c-stack .st-tab--2{ opacity: calc(.34 + .66 * var(--a2)); }
+.c-stack .st-tab--3{ opacity: calc(.34 + .66 * var(--a3)); }
+
+/* --- reduced motion: pinned to the finished state ------------------------ */
+@media (prefers-reduced-motion: reduce){
+  .c-stack .st{ --pp: 1; }
+  .c-stack .st-aura{ animation: none; }
+}
+</style>
+
+<div class="c-stack">
+  <div class="st">
+
+    <div class="st-bg" aria-hidden="true">
+      <span class="st-aura st-aura--1"></span>
+      <span class="st-aura st-aura--2"></span>
+      <span class="st-aura st-aura--3"></span>
+    </div>
+
+    <!-- ==================== STAGE 1 — Today ==================== -->
+    <section class="st-screen st-screen--today">
+      <div class="st-head">
+        <p class="st-title">Today</p>
+        <span class="st-plus" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </span>
+      </div>
+
+      <div class="st-flow">
+        <p class="st-label" style="--n:0">Morning</p>
+
+        <div class="st-card st-dose" style="--n:1">
+          <span class="st-disc" style="--d:var(--d-creatine)" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.6 2.2 5.1 12.6c-.33.4-.05 1 .48 1H10l-1.3 7.5c-.1.6.68.92 1.02.45l8.5-10.4c.32-.4.04-1-.48-1H13.9l1.3-7.4c.1-.6-.68-.92-1.02-.45z"/></svg>
+          </span>
+          <span class="st-dose-txt">
+            <span class="st-name">Creatine</span>
+            <span class="st-sub">5 g</span>
+          </span>
+          <span class="st-tick" aria-hidden="true"></span>
+        </div>
+
+        <div class="st-card st-dose" style="--n:2">
+          <span class="st-disc" style="--d:var(--d-omega)" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M2.6 12c3.4-5.4 11-5.7 14.5-.62.2.3.2.94 0 1.24C13.6 17.7 6 17.4 2.6 12z"/>
+              <path d="M17.5 9.5 21.4 7c.5-.32 1.1.1 1 .68L21.6 12l.8 4.32c.1.58-.5 1-1 .68l-3.9-2.5c-.42-.27-.53-.83-.24-1.24l.42-.6c.2-.28.2-.66 0-.94l-.42-.6c-.29-.4-.18-.97.24-1.24z"/>
+              <circle cx="7.4" cy="10.6" r=".95" fill="rgba(0,0,0,.45)"/>
+            </svg>
+          </span>
+          <span class="st-dose-txt">
+            <span class="st-name">Omega-3</span>
+            <span class="st-sub">1000 mg <em class="st-late">40 min late</em></span>
+          </span>
+          <span class="st-tick" aria-hidden="true"></span>
+        </div>
+
+        <div class="st-card st-dose" style="--n:3">
+          <span class="st-disc" style="--d:var(--d-d3)" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="12" r="4.7"/>
+              <g stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+                <path d="M12 1.9v2.3M12 19.8v2.3M1.9 12h2.3M19.8 12h2.3M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"/>
+              </g>
+            </svg>
+          </span>
+          <span class="st-dose-txt">
+            <span class="st-name">Vitamin D3</span>
+            <span class="st-sub">2000 IU</span>
+          </span>
+          <span class="st-tick" aria-hidden="true"></span>
+        </div>
+
+        <p class="st-label st-gap" style="--n:4">Night</p>
+
+        <div class="st-card st-dose" style="--n:5">
+          <span class="st-disc" style="--d:var(--d-mag)" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.7 14.6A8.2 8.2 0 0 1 9.6 5.4 8.2 8.2 0 1 0 18.7 14.6z"/>
+              <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.4 2.6h3.5l-3.5 3.7h3.5"/>
+                <path d="M19.6 7.6h2.6l-2.6 2.8h2.6"/>
+              </g>
+            </svg>
+          </span>
+          <span class="st-dose-txt">
+            <span class="st-name">Magnesium Glycinate</span>
+            <span class="st-sub">400 mg</span>
+          </span>
+          <span class="st-tick" aria-hidden="true"></span>
+        </div>
+
+        <div class="st-labelrow st-gap" style="--n:6">
+          <p class="st-label">Habits</p>
+          <span class="st-logged">2 logged</span>
+        </div>
+
+        <div class="st-card st-dose" style="--n:7">
+          <span class="st-disc" style="--d:var(--d-cold)" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <g><path d="M12 12V2.4M12 5.9 9.6 4.1M12 5.9l2.4-1.8"/></g>
+              <g transform="rotate(60 12 12)"><path d="M12 12V2.4M12 5.9 9.6 4.1M12 5.9l2.4-1.8"/></g>
+              <g transform="rotate(120 12 12)"><path d="M12 12V2.4M12 5.9 9.6 4.1M12 5.9l2.4-1.8"/></g>
+              <g transform="rotate(180 12 12)"><path d="M12 12V2.4M12 5.9 9.6 4.1M12 5.9l2.4-1.8"/></g>
+              <g transform="rotate(240 12 12)"><path d="M12 12V2.4M12 5.9 9.6 4.1M12 5.9l2.4-1.8"/></g>
+              <g transform="rotate(300 12 12)"><path d="M12 12V2.4M12 5.9 9.6 4.1M12 5.9l2.4-1.8"/></g>
+            </svg>
+          </span>
+          <span class="st-dose-txt">
+            <span class="st-name">Cold shower</span>
+            <span class="st-sub">3 min</span>
+          </span>
+          <span class="st-tick st-tick--on" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.6 9.6 17.7 19.5 6.9"/></svg>
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== STAGE 2 — Tracking ==================== -->
+    <section class="st-screen st-screen--track">
+      <div class="st-head">
+        <p class="st-title">Tracking</p>
+        <span class="st-plus" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </span>
+      </div>
+
+      <div class="st-flow">
+        <div class="st-labelrow" style="--n:0">
+          <p class="st-label">Supplements</p>
+          <span class="st-count">4</span>
+        </div>
+
+        <div class="st-card st-list" style="--n:1">
+          <div class="st-row" style="--t:var(--c-creatine)">
+            <span class="st-idisc" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.6 2.2 5.1 12.6c-.33.4-.05 1 .48 1H10l-1.3 7.5c-.1.6.68.92 1.02.45l8.5-10.4c.32-.4.04-1-.48-1H13.9l1.3-7.4c.1-.6-.68-.92-1.02-.45z"/></svg>
+            </span>
+            <span class="st-rowbody">
+              <span class="st-rowtop"><span class="st-rowname">Creatine</span><span class="st-pct">83%</span></span>
+              <span class="st-rowsub">Every day</span>
+              <span class="st-strip" aria-hidden="true"><i class="o"></i><i></i><i></i><i></i><i></i><i></i><i class="o"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="o"></i><i></i><i></i><i></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i></i><i></i><i></i></span>
+            </span>
+            <span class="st-chev" aria-hidden="true"><svg viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m1.4 1.4 5 5.6-5 5.6"/></svg></span>
+          </div>
+
+          <div class="st-row" style="--t:var(--c-mag)">
+            <span class="st-idisc" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.7 14.6A8.2 8.2 0 0 1 9.6 5.4 8.2 8.2 0 1 0 18.7 14.6z"/>
+                <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14.4 2.6h3.5l-3.5 3.7h3.5"/><path d="M19.6 7.6h2.6l-2.6 2.8h2.6"/>
+                </g>
+              </svg>
+            </span>
+            <span class="st-rowbody">
+              <span class="st-rowtop"><span class="st-rowname">Magnesium Glycinate</span><span class="st-pct">75%</span></span>
+              <span class="st-rowsub">Every day</span>
+              <span class="st-strip" aria-hidden="true"><i></i><i></i><i class="o"></i><i></i><i></i><i></i><i></i><i></i><i class="o"></i><i class="o"></i><i></i><i></i><i></i><i></i><i class="o"></i><i></i><i></i><i></i><i></i><i></i><i class="o"></i><i></i><i></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i class="o"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="o"></i><i class="o"></i><i></i><i></i><i></i></span>
+            </span>
+            <span class="st-chev" aria-hidden="true"><svg viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m1.4 1.4 5 5.6-5 5.6"/></svg></span>
+          </div>
+
+          <div class="st-row" style="--t:var(--c-omega)">
+            <span class="st-idisc" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M2.6 12c3.4-5.4 11-5.7 14.5-.62.2.3.2.94 0 1.24C13.6 17.7 6 17.4 2.6 12z"/>
+                <path d="M17.5 9.5 21.4 7c.5-.32 1.1.1 1 .68L21.6 12l.8 4.32c.1.58-.5 1-1 .68l-3.9-2.5c-.42-.27-.53-.83-.24-1.24l.42-.6c.2-.28.2-.66 0-.94l-.42-.6c-.29-.4-.18-.97.24-1.24z"/>
+                <circle cx="7.4" cy="10.6" r=".95" fill="rgba(0,0,0,.45)"/>
+              </svg>
+            </span>
+            <span class="st-rowbody">
+              <span class="st-rowtop"><span class="st-rowname">Omega-3</span><span class="st-pct">73%</span></span>
+              <span class="st-rowsub">Every day</span>
+              <span class="st-strip" aria-hidden="true"><i></i><i></i><i class="o"></i><i></i><i></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i></i><i></i><i></i><i class="o"></i><i class="o"></i><i></i><i></i><i></i><i class="o"></i><i></i><i></i><i></i><i class="o"></i><i></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i></i><i class="o"></i><i></i><i></i><i></i><i></i><i class="o"></i><i></i></span>
+            </span>
+            <span class="st-chev" aria-hidden="true"><svg viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m1.4 1.4 5 5.6-5 5.6"/></svg></span>
+          </div>
+
+          <div class="st-row" style="--t:var(--c-d3)">
+            <span class="st-idisc" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="12" cy="12" r="4.7"/>
+                <g stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+                  <path d="M12 1.9v2.3M12 19.8v2.3M1.9 12h2.3M19.8 12h2.3M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"/>
+                </g>
+              </svg>
+            </span>
+            <span class="st-rowbody">
+              <span class="st-rowtop"><span class="st-rowname">Vitamin D3</span><span class="st-pct">80%</span></span>
+              <span class="st-rowsub">Every day</span>
+              <span class="st-strip" aria-hidden="true"><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="o"></i><i></i><i></i><i></i><i></i><i class="o"></i><i></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="o"></i><i></i><i></i><i></i><i></i><i class="o"></i><i></i><i></i></span>
+            </span>
+            <span class="st-chev" aria-hidden="true"><svg viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m1.4 1.4 5 5.6-5 5.6"/></svg></span>
+          </div>
+        </div>
+
+        <div class="st-labelrow st-gap" style="--n:5">
+          <p class="st-label">Habits</p>
+          <span class="st-count">4</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== STAGE 3 — Experiments ==================== -->
+    <section class="st-screen st-screen--exp">
+      <div class="st-head">
+        <p class="st-title">Experiments</p>
+        <span class="st-plus" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </span>
+      </div>
+
+      <div class="st-flow">
+        <div class="st-card st-exp" style="--n:0; --t:var(--c-cold)">
+          <span class="st-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">
+              <g><path d="M12 12V2.4M12 5.9 9.6 4.1M12 5.9l2.4-1.8"/></g>
+              <g transform="rotate(60 12 12)"><path d="M12 12V2.4M12 5.9 9.6 4.1M12 5.9l2.4-1.8"/></g>
+              <g transform="rotate(120 12 12)"><path d="M12 12V2.4M12 5.9 9.6 4.1M12 5.9l2.4-1.8"/></g>
+              <g transform="rotate(180 12 12)"><path d="M12 12V2.4M12 5.9 9.6 4.1M12 5.9l2.4-1.8"/></g>
+              <g transform="rotate(240 12 12)"><path d="M12 12V2.4M12 5.9 9.6 4.1M12 5.9l2.4-1.8"/></g>
+              <g transform="rotate(300 12 12)"><path d="M12 12V2.4M12 5.9 9.6 4.1M12 5.9l2.4-1.8"/></g>
+            </svg>
+          </span>
+          <span class="st-exptitle">Cold shower → HRV</span>
+          <span class="st-verdict">Higher HRV</span>
+          <div class="st-scale">
+            <div class="st-track" aria-hidden="true" style="--mag:.52">
+              <span class="st-fill"></span>
+              <span class="st-datum"></span>
+            </div>
+            <div class="st-ends" aria-hidden="true">
+              <span>lower</span><span class="st-polarity">higher is better</span><span>higher</span>
+            </div>
+          </div>
+          <p class="st-sentence">On Cold shower days, your HRV (SDNN) averages 12% higher.</p>
+          <p class="st-evidence"><b>23</b> days · Moderate confidence · +12%</p>
+        </div>
+
+        <div class="st-card st-exp" style="--n:2; --t:var(--c-mag)">
+          <span class="st-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.7 14.6A8.2 8.2 0 0 1 9.6 5.4 8.2 8.2 0 1 0 18.7 14.6z"/>
+              <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.4 2.6h3.5l-3.5 3.7h3.5"/><path d="M19.6 7.6h2.6l-2.6 2.8h2.6"/>
+              </g>
+            </svg>
+          </span>
+          <span class="st-exptitle">Magnesium → Deep Sleep</span>
+          <span class="st-verdict">Higher deep sleep</span>
+          <div class="st-scale">
+            <div class="st-track" aria-hidden="true" style="--mag:.68">
+              <span class="st-fill"></span>
+              <span class="st-datum"></span>
+            </div>
+            <div class="st-ends" aria-hidden="true">
+              <span>lower</span><span class="st-polarity">higher is better</span><span>higher</span>
+            </div>
+          </div>
+          <p class="st-sentence">On Magnesium Glycinate days, your Deep Sleep averages 19% higher.</p>
+          <p class="st-evidence"><b>18</b> days · Moderate confidence · +19%</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- the app's own hand-drawn tab glyphs -->
+    <div class="st-tabbar" aria-hidden="true">
+      <span class="st-tabsel"></span>
+      <span class="st-tab st-tab--1">
+        <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 26 19 33 31 19M44 26h42M12 55h19M44 55h42M12 82h19M44 82h42"/>
+        </svg>
+      </span>
+      <span class="st-tab st-tab--2">
+        <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 52h20l10-22 12 44 11-28 7 6h20"/>
+        </svg>
+      </span>
+      <span class="st-tab st-tab--3">
+        <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M31 13h32"/>
+          <path d="M36 13v61c0 14 22 14 22 0V13"/>
+          <path d="M36 55h22"/>
+          <circle cx="72" cy="33" r="4"/>
+          <circle cx="82" cy="18" r="5.5"/>
+        </svg>
+      </span>
+    </div>
+
+  </div>
+</div>

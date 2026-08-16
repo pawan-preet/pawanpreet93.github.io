@@ -1,0 +1,357 @@
+<style>
+/* ── Flap Pomodoro — TimerView: the split-flap board, phase pill, Start, tab bar.
+   Every value ported from the app's own source:
+     Shared/FlapTheme.swift  → Classic theme (the shipping default)
+        background #000 · tileTop rgb(.165,.165,.180)=#2A2A2E · tileBottom #1C1C1F
+        flapText #F5F4F0 · seam rgba(0,0,0,.55)
+        derived leaf shading: topLit +11% #414145 · topShade -7% #27272B
+                              bottomShade -10% #19191C · bottomBounce +6% #2A2A2C
+        seamShadow .40 · leafEdge rgba(255,255,255,.20) · topHighlight rgba(255,255,255,.16)
+        edgeShade .20 · pin tileTop-38% #1A1A1C, hairline rgba(255,255,255,.13)
+        accent = HSB(hue .667, sat .083, bri .82) → #C0C0D1 (the pale lavender the
+        source itself names in a comment); onAccent = ink #141414
+        boardCaption rgba(255,255,255,.62) · captionDimmed rgba(255,255,255,.44)
+     Shared/FlapTokens.swift → characterAspect .72 · cornerRadiusRatio .09 (= 12.5%/18%
+        on a half) · characterSpacing 2 · fontRatio .58 medium monospaced · seam 1
+        seamShadow .16h · edgeShade .07w · topHighlight .008h · leafEdge .012h
+        pin .055w × .045h, inset .045w · flip .18s, fold portion .62, stagger .04s
+     Shared/FlapViews.swift  → fold −89° about the seam, perspective .4 (⇒ 2.5×width),
+        land +89° → 0, both with a .35 black shade that sheds as the leaf catches light
+     FlapPomodoro/TimerView.swift, RootView.swift, Shared/BoardComponents.swift →
+        phase pill (timer glyph · "Work" 15/medium · chevron.up.chevron.down 9),
+        Start 17/medium on a prominent accent capsule, max width 220,
+        tabs Timer/Tasks/Stats/Settings.                                              */
+
+.c-flappomodoro{
+  --_p: var(--p, 1);
+
+  --tile-lit:#414145;   --tile-shade:#27272B;
+  --tile-bsh:#19191C;   --tile-bounce:#2A2A2C;
+  --flap-ink:#F5F4F0;
+  --seam:rgba(0,0,0,.55);
+  --pin:#1A1A1C;
+  /* not the panel tint: on the Classic board the accent is derived from the charcoal
+     tile itself and resolves to this pale lavender. Hard-coded because it is the
+     board's own colour, the way a tyre compound is. */
+  --pale:#C0C0D1;
+  --on-pale:#141414;
+  --cap:rgba(255,255,255,.62);
+  --cap-dim:rgba(255,255,255,.44);
+
+  container-type: inline-size;
+  position: relative;
+  isolation: isolate;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 34rem;
+  margin: 0 auto;
+  background: #000;
+  font-family: var(--sans, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif);
+  color: var(--ink, #fff);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.c-flappomodoro *{ box-sizing: border-box; }
+
+/* one app point. 393pt of phone across the stage, so 24pt gutters + a 345pt board
+   land exactly on the edges. Declared on the child: cq units never resolve against
+   their own container. */
+.c-flappomodoro > .screen{
+  --pt: clamp(.04rem, .2545cqw, .0865rem);
+  --th: calc(var(--pt) * 94);            /* FittedFlapText height on a 393pt screen */
+  --tw: calc(var(--th) * .72);           /* characterAspect */
+  --seamw: max(1px, calc(var(--th) * .0106));
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: calc(var(--pt) * 16) calc(var(--pt) * 24);
+}
+
+/* ── phase pill ─────────────────────────────────────────────────────────── */
+.c-flappomodoro .pill{
+  --e: clamp(0, calc(var(--_p) * 22), 1);
+  display: inline-flex; align-items: center;
+  gap: calc(var(--pt) * 6);
+  padding: calc(var(--pt) * 8) calc(var(--pt) * 14);
+  border-radius: 999px;
+  background: rgba(255,255,255,.085);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.13),
+              inset 0 1px 0 rgba(255,255,255,.10);
+  color: var(--ink, #fff);
+  font-size: calc(var(--pt) * 15);
+  font-weight: 500;
+  letter-spacing: .002em;
+  line-height: 1;
+  white-space: nowrap;
+  opacity: var(--e);
+  transform: translateY(calc((1 - var(--e)) * var(--pt) * -7));
+}
+.c-flappomodoro .pill svg{ width: calc(var(--pt) * 14); height: calc(var(--pt) * 14); display: block; }
+.c-flappomodoro .pill .chev{ width: calc(var(--pt) * 8); height: calc(var(--pt) * 12);
+  margin-left: calc(var(--pt) * 1); color: var(--cap); }
+
+/* ── the board ──────────────────────────────────────────────────────────── */
+.c-flappomodoro .board{
+  display: flex;
+  justify-content: center;
+  gap: calc(var(--th) * .018);           /* characterSpacing 2 of 110 */
+  width: 100%;
+  margin: calc(var(--pt) * 44) 0 calc(var(--pt) * 34);
+}
+.c-flappomodoro .tile{
+  --e: clamp(0, calc((var(--_p) - var(--n) * .022) * 19), 1);
+  position: relative;
+  flex: 0 0 auto;
+  width: var(--tw);
+  height: var(--th);
+  border-radius: 12.5% / 9%;
+  box-shadow: 0 calc(var(--pt) * 1.5) calc(var(--pt) * 3) rgba(0,0,0,.35);
+  perspective: calc(var(--tw) * 2.5);    /* SwiftUI perspective .4 */
+  opacity: var(--e);
+  transform: translateY(calc((1 - var(--e)) * var(--pt) * 16));
+}
+
+/* leaf material — lit upper leaf, shaded lower leaf, both sunk in a slot */
+.c-flappomodoro .lt{
+  background:
+    linear-gradient(to top, var(--seam) 0 var(--seamw), rgba(0,0,0,0) var(--seamw)),
+    linear-gradient(to top, rgba(255,255,255,.20) 0 2.4%, rgba(255,255,255,0) 2.4%),
+    linear-gradient(to bottom, rgba(255,255,255,.16) 0 max(.6px, 1.6%), rgba(255,255,255,0) max(.6px, 1.6%)),
+    linear-gradient(to right, rgba(0,0,0,.20), rgba(0,0,0,0) 7%),
+    linear-gradient(to left,  rgba(0,0,0,.20), rgba(0,0,0,0) 7%),
+    linear-gradient(var(--tile-lit), var(--tile-shade));
+  border-radius: 12.5% 12.5% 0 0 / 18% 18% 0 0;
+}
+.c-flappomodoro .lb{
+  background:
+    linear-gradient(to bottom, var(--seam) 0 var(--seamw), rgba(0,0,0,0) var(--seamw)),
+    linear-gradient(to bottom, rgba(0,0,0,.40), rgba(0,0,0,0) 32%),
+    linear-gradient(to right, rgba(0,0,0,.20), rgba(0,0,0,0) 7%),
+    linear-gradient(to left,  rgba(0,0,0,.20), rgba(0,0,0,0) 7%),
+    linear-gradient(var(--tile-bsh), var(--tile-bounce));
+  border-radius: 0 0 12.5% 12.5% / 0 0 18% 18%;
+}
+
+.c-flappomodoro .half{
+  position: absolute; left: 0; right: 0; top: 0;
+  height: 50%;
+  overflow: hidden;
+}
+.c-flappomodoro .half.bot{ top: auto; bottom: 0; }
+
+/* the glyph box is a full tile tall inside a half-tall window, so the character
+   sits across the seam exactly as one drawn character split in two */
+.c-flappomodoro .g{
+  position: absolute; left: 0; top: 0;
+  width: 100%; height: var(--th);
+  font-family: var(--mono, ui-monospace, "IBM Plex Mono", SFMono-Regular, Menlo, monospace);
+  font-size: calc(var(--th) * .58);      /* fontRatio */
+  font-weight: 500;
+  line-height: 1;
+  color: var(--flap-ink);
+  text-shadow: 0 .018em .01em rgba(0,0,0,.4);
+}
+.c-flappomodoro .half.bot .g,
+.c-flappomodoro .land .g{ top: auto; bottom: 0; }
+.c-flappomodoro .g i,
+.c-flappomodoro .leaf > i{
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-style: normal;
+}
+/* a face is lit only inside its own window of the countdown */
+.c-flappomodoro .g i{
+  opacity: calc(
+    clamp(0, calc((var(--_p) - var(--a)) * 900), 1) *
+    clamp(0, calc((var(--b) - var(--_p)) * 900), 1));
+}
+
+/* ── the flip ───────────────────────────────────────────────────────────── */
+.c-flappomodoro .leaf{
+  position: absolute; left: 0; right: 0;
+  height: 50%;
+  overflow: hidden;
+  backface-visibility: hidden;
+  font-family: var(--mono, ui-monospace, "IBM Plex Mono", SFMono-Regular, Menlo, monospace);
+  font-size: calc(var(--th) * .58);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--flap-ink);
+  text-shadow: 0 .018em .01em rgba(0,0,0,.4);
+}
+.c-flappomodoro .leaf > i{ height: var(--th); inset: 0 0 auto; }
+.c-flappomodoro .land > i{ inset: auto 0 0; }
+.c-flappomodoro .leaf::after{      /* the shade it takes on as it turns from the light */
+  content: ""; position: absolute; inset: 0;
+  background: #000;
+  opacity: calc(.35 * var(--dk));
+  border-radius: inherit;
+}
+/* upper leaf folding down about the seam, easing in */
+.c-flappomodoro .fold{
+  top: 0;
+  transform-origin: 50% 100%;
+  --q: clamp(0, calc((var(--_p) - var(--s)) * 76.923), 1);
+  --dk: var(--q);
+  transform: rotateX(calc(var(--q) * -89deg));
+  opacity: calc(
+    clamp(0, calc((var(--_p) - var(--s)) * 900), 1) *
+    clamp(0, calc((var(--s) + .0135 - var(--_p)) * 900), 1));
+}
+/* lower leaf landing about the seam, easing out */
+.c-flappomodoro .land{
+  bottom: 0;
+  transform-origin: 50% 0;
+  --q: clamp(0, calc((var(--_p) - var(--s) - .0125) * 125), 1);
+  --dk: calc(1 - var(--q));
+  transform: rotateX(calc((1 - var(--q)) * 89deg));
+  opacity: calc(
+    clamp(0, calc((var(--_p) - var(--s) - .0125) * 900), 1) *
+    clamp(0, calc((var(--s) + .021 - var(--_p)) * 900), 1));
+}
+
+/* the axle the leaves pivot on — housing, so it sits above the moving card */
+.c-flappomodoro .pin{
+  position: absolute; top: 50%;
+  width: calc(var(--tw) * .055);
+  height: calc(var(--th) * .045);
+  margin-top: calc(var(--th) * -.0225);
+  border-radius: 999px;
+  background: var(--pin);
+  box-shadow: inset 0 0 0 .5px rgba(255,255,255,.13);
+}
+.c-flappomodoro .pin.l{ left: calc(var(--tw) * .045); }
+.c-flappomodoro .pin.r{ right: calc(var(--tw) * .045); }
+
+/* ── Start ──────────────────────────────────────────────────────────────── */
+.c-flappomodoro .ctl{
+  --e: clamp(0, calc((var(--_p) - .12) * 12), 1);
+  width: 100%;
+  display: flex; justify-content: center;
+  opacity: var(--e);
+  transform: translateY(calc((1 - var(--e)) * var(--pt) * 10));
+}
+.c-flappomodoro .start{
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: calc(var(--pt) * 220);
+  padding: calc(var(--pt) * 14) 0;
+  border-radius: 999px;
+  background:
+    linear-gradient(rgba(255,255,255,.22), rgba(255,255,255,0) 58%),
+    var(--pale);
+  box-shadow: 0 calc(var(--pt) * 1) calc(var(--pt) * 3) rgba(0,0,0,.5),
+              inset 0 0 0 .5px rgba(255,255,255,.42);
+  color: var(--on-pale);
+  font-size: calc(var(--pt) * 17);
+  font-weight: 500;
+  line-height: 1;
+  text-align: center;
+}
+.c-flappomodoro .start::after{     /* ambient: a slow glass sheen, secondary only */
+  content: ""; position: absolute; top: -60%; bottom: -60%; left: 0;
+  width: 34%;
+  background: linear-gradient(100deg, rgba(255,255,255,0), rgba(255,255,255,.5), rgba(255,255,255,0));
+  opacity: .5;
+  animation: flappom-sheen 7.5s cubic-bezier(.5,0,.5,1) infinite;
+}
+@keyframes flappom-sheen{
+  0%, 62%  { transform: translateX(-140%); }
+  100%     { transform: translateX(430%); }
+}
+
+/* ── tab bar ────────────────────────────────────────────────────────────── */
+.c-flappomodoro .tabs{
+  --e: clamp(0, calc((var(--_p) - .05) * 14), 1);
+  display: flex;
+  width: 100%;
+  margin-top: calc(var(--pt) * 34);
+  padding: calc(var(--pt) * 9) calc(var(--pt) * 6);
+  border-radius: calc(var(--pt) * 26);
+  background: rgba(255,255,255,.055);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.09),
+              inset 0 1px 0 rgba(255,255,255,.07);
+  opacity: var(--e);
+  transform: translateY(calc((1 - var(--e)) * var(--pt) * 12));
+}
+.c-flappomodoro .tab{
+  flex: 1 1 0;
+  display: flex; flex-direction: column; align-items: center;
+  gap: calc(var(--pt) * 3);
+  color: var(--cap-dim);
+}
+.c-flappomodoro .tab.on{ color: var(--pale); }
+.c-flappomodoro .tab svg{
+  width: calc(var(--pt) * 23); height: calc(var(--pt) * 23);
+  display: block;
+}
+.c-flappomodoro .tab .lab{
+  font-size: calc(var(--pt) * 10.5);
+  font-weight: 500;
+  letter-spacing: .01em;
+  line-height: 1.2;
+}
+
+/* ── finished state, no motion ──────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce){
+  .c-flappomodoro{ --_p: 1; }
+  .c-flappomodoro .start::after{ animation: none; opacity: .18; transform: translateX(180%); }
+}
+</style>
+
+<div class="c-flappomodoro">
+  <div class="screen">
+
+    <span class="pill">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13.6" r="8.1"/><path d="M9.3 2.4h5.4"/><path d="M12 2.4v3.1"/><path d="M12 13.6 15.9 9.9"/></svg>
+      Work
+      <svg class="chev" viewBox="0 0 12 18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.4 6.6 6 3l3.6 3.6"/><path d="M2.4 11.4 6 15l3.6-3.6"/></svg>
+    </span>
+
+    <div class="board" role="img" aria-label="Split-flap timer counting down from 25 minutes 00 seconds">
+
+      <div class="tile" aria-hidden="true" style="--n:0">
+        <div class="half lt"><div class="g"><i style="--a:-1;--b:9">2</i></div></div>
+        <div class="half bot lb"><div class="g"><i style="--a:-1;--b:9">2</i></div></div>
+        
+        <b class="pin l"></b><b class="pin r"></b>
+      </div>
+      <div class="tile" aria-hidden="true" style="--n:1">
+        <div class="half lt"><div class="g"><i style="--a:-1;--b:0.185">5</i><i style="--a:0.185;--b:9">4</i></div></div>
+        <div class="half bot lb"><div class="g"><i style="--a:-1;--b:0.2025">5</i><i style="--a:0.2025;--b:9">4</i></div></div>
+        <div class="leaf fold lt" style="--s:0.1835"><i>5</i></div><div class="leaf land lb" style="--s:0.1835"><i>4</i></div>
+        <b class="pin l"></b><b class="pin r"></b>
+      </div>
+      <div class="tile" aria-hidden="true" style="--n:2">
+        <div class="half lt"><div class="g"><i style="--a:-1;--b:9">:</i></div></div>
+        <div class="half bot lb"><div class="g"><i style="--a:-1;--b:9">:</i></div></div>
+        
+        <b class="pin l"></b><b class="pin r"></b>
+      </div>
+      <div class="tile" aria-hidden="true" style="--n:3">
+        <div class="half lt"><div class="g"><i style="--a:-1;--b:0.192">0</i><i style="--a:0.192;--b:0.692">5</i><i style="--a:0.692;--b:9">4</i></div></div>
+        <div class="half bot lb"><div class="g"><i style="--a:-1;--b:0.2095">0</i><i style="--a:0.2095;--b:0.7095">5</i><i style="--a:0.7095;--b:9">4</i></div></div>
+        <div class="leaf fold lt" style="--s:0.1905"><i>0</i></div><div class="leaf land lb" style="--s:0.1905"><i>5</i></div><div class="leaf fold lt" style="--s:0.6905"><i>5</i></div><div class="leaf land lb" style="--s:0.6905"><i>4</i></div>
+        <b class="pin l"></b><b class="pin r"></b>
+      </div>
+      <div class="tile" aria-hidden="true" style="--n:4">
+        <div class="half lt"><div class="g"><i style="--a:-1;--b:0.1955">0</i><i style="--a:0.1955;--b:0.2455">9</i><i style="--a:0.2455;--b:0.2955">8</i><i style="--a:0.2955;--b:0.3455">7</i><i style="--a:0.3455;--b:0.3955">6</i><i style="--a:0.3955;--b:0.4455">5</i><i style="--a:0.4455;--b:0.4955">4</i><i style="--a:0.4955;--b:0.5455">3</i><i style="--a:0.5455;--b:0.5955">2</i><i style="--a:0.5955;--b:0.6455">1</i><i style="--a:0.6455;--b:0.6955">0</i><i style="--a:0.6955;--b:0.7455">9</i><i style="--a:0.7455;--b:0.7955">8</i><i style="--a:0.7955;--b:0.8455">7</i><i style="--a:0.8455;--b:0.8955">6</i><i style="--a:0.8955;--b:9">5</i></div></div>
+        <div class="half bot lb"><div class="g"><i style="--a:-1;--b:0.213">0</i><i style="--a:0.213;--b:0.263">9</i><i style="--a:0.263;--b:0.313">8</i><i style="--a:0.313;--b:0.363">7</i><i style="--a:0.363;--b:0.413">6</i><i style="--a:0.413;--b:0.463">5</i><i style="--a:0.463;--b:0.513">4</i><i style="--a:0.513;--b:0.563">3</i><i style="--a:0.563;--b:0.613">2</i><i style="--a:0.613;--b:0.663">1</i><i style="--a:0.663;--b:0.713">0</i><i style="--a:0.713;--b:0.763">9</i><i style="--a:0.763;--b:0.813">8</i><i style="--a:0.813;--b:0.863">7</i><i style="--a:0.863;--b:0.913">6</i><i style="--a:0.913;--b:9">5</i></div></div>
+        <div class="leaf fold lt" style="--s:0.194"><i>0</i></div><div class="leaf land lb" style="--s:0.194"><i>9</i></div><div class="leaf fold lt" style="--s:0.244"><i>9</i></div><div class="leaf land lb" style="--s:0.244"><i>8</i></div><div class="leaf fold lt" style="--s:0.294"><i>8</i></div><div class="leaf land lb" style="--s:0.294"><i>7</i></div><div class="leaf fold lt" style="--s:0.344"><i>7</i></div><div class="leaf land lb" style="--s:0.344"><i>6</i></div><div class="leaf fold lt" style="--s:0.394"><i>6</i></div><div class="leaf land lb" style="--s:0.394"><i>5</i></div><div class="leaf fold lt" style="--s:0.444"><i>5</i></div><div class="leaf land lb" style="--s:0.444"><i>4</i></div><div class="leaf fold lt" style="--s:0.494"><i>4</i></div><div class="leaf land lb" style="--s:0.494"><i>3</i></div><div class="leaf fold lt" style="--s:0.544"><i>3</i></div><div class="leaf land lb" style="--s:0.544"><i>2</i></div><div class="leaf fold lt" style="--s:0.594"><i>2</i></div><div class="leaf land lb" style="--s:0.594"><i>1</i></div><div class="leaf fold lt" style="--s:0.644"><i>1</i></div><div class="leaf land lb" style="--s:0.644"><i>0</i></div><div class="leaf fold lt" style="--s:0.694"><i>0</i></div><div class="leaf land lb" style="--s:0.694"><i>9</i></div><div class="leaf fold lt" style="--s:0.744"><i>9</i></div><div class="leaf land lb" style="--s:0.744"><i>8</i></div><div class="leaf fold lt" style="--s:0.794"><i>8</i></div><div class="leaf land lb" style="--s:0.794"><i>7</i></div><div class="leaf fold lt" style="--s:0.844"><i>7</i></div><div class="leaf land lb" style="--s:0.844"><i>6</i></div><div class="leaf fold lt" style="--s:0.894"><i>6</i></div><div class="leaf land lb" style="--s:0.894"><i>5</i></div>
+        <b class="pin l"></b><b class="pin r"></b>
+      </div>
+    </div>
+
+    <div class="ctl"><span class="start">Start</span></div>
+
+    <div class="tabs">
+        <span class="tab on" style="--n:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13.6" r="8.1"/><path d="M9.3 2.4h5.4"/><path d="M12 2.4v3.1"/><path d="M12 13.6 15.9 9.9"/></svg><span class="lab">Timer</span></span>
+        <span class="tab" style="--n:1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.9 5.6 3.5 7.2 6.6 4"/><path d="M1.9 12.4 3.5 14 6.6 10.8"/><path d="M2.1 19.2h4.3"/><path d="M9.9 5.7h12.2"/><path d="M9.9 12.5h12.2"/><path d="M9.9 19.2h12.2"/></svg><span class="lab">Tasks</span></span>
+        <span class="tab" style="--n:2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M3.6 17.4V11"/><path d="M9.2 17.4V4.6"/><path d="M14.8 17.4V8.2"/><path d="M20.4 17.4v-4.1"/><path d="M2.2 20.6h19.6"/></svg><span class="lab">Stats</span></span>
+        <span class="tab" style="--n:3"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><g><circle cx="12" cy="12" r="6.6"/><rect x="10.55" y="1.9" width="2.9" height="20.2" rx="1.35" transform="rotate(0 12 12)"/><rect x="10.55" y="1.9" width="2.9" height="20.2" rx="1.35" transform="rotate(45 12 12)"/><rect x="10.55" y="1.9" width="2.9" height="20.2" rx="1.35" transform="rotate(90 12 12)"/><rect x="10.55" y="1.9" width="2.9" height="20.2" rx="1.35" transform="rotate(135 12 12)"/></g><circle cx="12" cy="12" r="2.55" fill="#000"/></svg><span class="lab">Settings</span></span>
+    </div>
+
+  </div>
+</div>

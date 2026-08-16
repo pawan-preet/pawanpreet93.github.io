@@ -1,0 +1,212 @@
+{
+ "moon": {
+  "shots": [
+   {
+    "src": "moon-1.webp",
+    "w": 620,
+    "h": 1348
+   },
+   {
+    "src": "moon-2.webp",
+    "w": 620,
+    "h": 1348
+   }
+  ],
+  "accent": "#1b1f2d"
+ },
+ "pomodoro": {
+  "shots": [
+   {
+    "src": "pomodoro-1.webp",
+    "w": 620,
+    "h": 1348
+   }
+  ],
+  "accent": "#3a73e2"
+ },
+ "watermyplants": {
+  "shots": [
+   {
+    "src": "watermyplants-1.webp",
+    "w": 620,
+    "h": 1348
+   }
+  ],
+  "accent": "#162508"
+ },
+ "enso": {
+  "shots": [
+   {
+    "src": "enso-1.webp",
+    "w": 620,
+    "h": 1348
+   },
+   {
+    "src": "enso-2.webp",
+    "w": 620,
+    "h": 1348
+   }
+  ],
+  "accent": "#f4ce60"
+ },
+ "helia": {
+  "shots": [
+   {
+    "src": "helia-1.webp",
+    "w": 620,
+    "h": 1348
+   },
+   {
+    "src": "helia-2.webp",
+    "w": 620,
+    "h": 1348
+   }
+  ],
+  "accent": "#db9d58"
+ },
+ "flux": {
+  "shots": [
+   {
+    "src": "flux-1.webp",
+    "w": 620,
+    "h": 1348
+   },
+   {
+    "src": "flux-2.webp",
+    "w": 620,
+    "h": 1348
+   },
+   {
+    "src": "flux-3.webp",
+    "w": 620,
+    "h": 1348
+   }
+  ],
+  "accent": "#2170bb"
+ },
+ "linen": {
+  "shots": [
+   {
+    "src": "linen-1.webp",
+    "w": 620,
+    "h": 1348
+   },
+   {
+    "src": "linen-2.webp",
+    "w": 620,
+    "h": 1348
+   },
+   {
+    "src": "linen-3.webp",
+    "w": 620,
+    "h": 1348
+   }
+  ],
+  "accent": "#787063"
+ },
+ "stack": {
+  "shots": [
+   {
+    "src": "stack-1.webp",
+    "w": 620,
+    "h": 1348
+   }
+  ],
+  "accent": "#4536b8"
+ },
+ "slate": {
+  "shots": [
+   {
+    "src": "slate-1.webp",
+    "w": 620,
+    "h": 1348
+   }
+  ],
+  "accent": "#b6d4eb"
+ },
+ "folio": {
+  "shots": [
+   {
+    "src": "folio-1.webp",
+    "w": 620,
+    "h": 1348
+   },
+   {
+    "src": "folio-2.webp",
+    "w": 620,
+    "h": 1348
+   }
+  ],
+  "accent": "#f4ce5c"
+ },
+ "flaps": {
+  "shots": [
+   {
+    "src": "flaps-1.webp",
+    "w": 620,
+    "h": 1348
+   }
+  ],
+  "accent": "#664f26"
+ },
+ "haru": {
+  "shots": [
+   {
+    "src": "haru-1.webp",
+    "w": 620,
+    "h": 1348
+   }
+  ],
+  "accent": "#bb812f"
+ },
+ "meridian": {
+  "shots": [
+   {
+    "src": "meridian-1.webp",
+    "w": 620,
+    "h": 1348
+   }
+  ],
+  "accent": "#a1611e"
+ },
+ "threshold": {
+  "shots": [
+   {
+    "src": "threshold-1.webp",
+    "w": 620,
+    "h": 1348
+   }
+  ],
+  "accent": null
+ },
+ "apex": {
+  "shots": [
+   {
+    "src": "apex-1.webp",
+    "w": 620,
+    "h": 1348
+   }
+  ],
+  "accent": "#80211c"
+ },
+ "cabin": {
+  "shots": [
+   {
+    "src": "cabin-1.webp",
+    "w": 620,
+    "h": 1348
+   }
+  ],
+  "accent": "#868686"
+ },
+ "flappomodoro": {
+  "shots": [
+   {
+    "src": "flappomodoro-1.webp",
+    "w": 620,
+    "h": 1348
+   }
+  ],
+  "accent": "#1b1f26"
+ }
+}

@@ -1,0 +1,637 @@
+{
+  "site": {
+    "name": "Pawanpreet Singh",
+    "domain": "pawan.bio",
+    "role": "Founding Team @ Ultrahuman",
+    "email": "pawanpreetsingh@icloud.com",
+    "hometown": "Patiala, Punjab",
+    "city": "Bengaluru, Karnataka",
+    "intro": "I build small, native Apple apps. The kind that open fast, keep your data on your own device, and then get out of the way.",
+    "bio": [
+      "I'm an iOS engineer on the founding team at Ultrahuman. Before that: Zomato, LimeTray, Zolo.",
+      "Apple gave me a WWDC Student Scholarship in 2016 and I've written Swift most days since. All of it was built after hours, by one person, with no team and no funding.",
+      "One idea runs through all of it. Build native. Compute on the device. Send nothing home."
+    ],
+    "principles": [
+      {
+        "t": "Native, or not at all",
+        "d": "SwiftUI and UIKit, Metal where it earns its keep, and Apple Watch, widgets, Live Activities and Vision Pro built properly rather than ticked off."
+      },
+      {
+        "t": "The data is yours",
+        "d": "Storage on your device, sync through your own iCloud if you want it. No account to make, nothing to log into, no server holding your history."
+      },
+      {
+        "t": "Honest about what it knows",
+        "d": "When an app makes a claim about your body or your money it shows its working: the sample size, the confidence, and the reasons it might be wrong."
+      }
+    ]
+  },
+  "apps": [
+    {
+      "slug": "moon",
+      "name": "Moon",
+      "folder": "MoonPhases",
+      "tagline": "The real moon, exactly as you see it.",
+      "category": "Weather",
+      "year": "2026",
+      "blurb": "A photorealistic lunar sphere rendered in Metal and lit at tonight's true phase. Spin it like a globe, drag a timeline to watch it wax and wane through any date, then pull up a glass drawer of precise figures: illumination, moonrise and moonset, distance, altitude and azimuth.",
+      "detail": "A single on-device astronomy engine built on Meeus' algorithms feeds every surface: iPhone, iPad, Mac, Vision Pro, Apple Watch, widgets and complications. The moon is oriented to your sky rather than to a stock illustration, at your latitude, on your date.",
+      "platforms": [
+        "iPhone",
+        "iPad",
+        "Vision Pro",
+        "Watch"
+      ],
+      "highlights": [
+        "Metal-rendered sphere with a true terminator",
+        "NASA surface imagery",
+        "Scrub the timeline to any date",
+        "Widgets and watch complications"
+      ],
+      "privacy": {
+        "network": "none",
+        "summary": "Zero network access. Every figure is computed on your device.",
+        "storage": "on-device only",
+        "location": "When-In-Use, used on-device to orient the sky, never transmitted",
+        "health": null,
+        "analytics": "none",
+        "thirdparty": [],
+        "iap": {
+          "name": "Moon Pro",
+          "plans": [
+            "Lifetime"
+          ],
+          "trial": "No trial; a single one-time purchase",
+          "free": "The moon, the timeline and the facts drawer, in full.",
+          "unlocks": "The Moon Details widget, and rise, set and special-event alerts."
+        },
+        "cloudSync": false
+      },
+      "accent": "#7C86B8"
+    },
+    {
+      "slug": "pomodoro",
+      "name": "Pomodoro",
+      "storeName": "Pomodoro Focus Timer",
+      "folder": "pomodoro",
+      "appStoreId": "1504867122",
+      "tagline": "Deep focus, one tomato at a time.",
+      "category": "Productivity",
+      "year": "2020",
+      "blurb": "A native focus timer built on the Pomodoro technique: twenty-five minute sprints, breaks you actually take, and a task list light enough to keep using. Streaks and heatmaps make the effort visible without turning it into a game you can lose.",
+      "detail": "The timer lives everywhere the system allows. Home and Lock Screen widgets, Live Activities with Dynamic Island, a full Apple Watch app with complications, and Siri Shortcuts. You can start a session and steer it without ever opening the app.",
+      "platforms": [
+        "iPhone",
+        "iPad",
+        "Mac",
+        "Watch"
+      ],
+      "highlights": [
+        "Live Activities and Dynamic Island",
+        "Apple Watch app with complications",
+        "Focus heatmaps and streaks",
+        "Syncs through your own iCloud"
+      ],
+      "privacy": {
+        "network": "purchases and analytics",
+        "summary": "Timers and tasks sync through your own private iCloud. Purchase state and usage analytics go to third-party services.",
+        "storage": "Core Data, synced to your private iCloud (CloudKit)",
+        "location": null,
+        "health": null,
+        "analytics": "Amplitude: product analytics on how the app is used",
+        "thirdparty": [
+          "RevenueCat (purchase state)",
+          "Amplitude (product analytics)"
+        ],
+        "iap": {
+          "name": "Pomodoro Pro",
+          "plans": [
+            "Monthly",
+            "Annual",
+            "Lifetime"
+          ],
+          "trial": "7-day free trial",
+          "free": "Four completed work sessions a day and five active tasks.",
+          "unlocks": "Unlimited sessions and tasks, full history, every accent colour, and the Pro widgets."
+        },
+        "cloudSync": true
+      },
+      "accent": "#3A73E2"
+    },
+    {
+      "slug": "watermyplants",
+      "name": "WaterMyPlants",
+      "folder": "WaterMyPlant",
+      "appStoreId": "1474539700",
+      "tagline": "Never let a plant go thirsty.",
+      "category": "Lifestyle",
+      "year": "2019",
+      "blurb": "Watering reminders sized to each plant instead of a generic weekly nag. Add a plant, say how much it drinks and how often, and the app remembers the rest.",
+      "detail": "The oldest app here and the one that reaches furthest back, still supporting iOS 16. Rebuilt around a Liquid Glass redesign with photo-forward cards, an Apple Watch app and a widget. Ships in English and Hindi.",
+      "platforms": [
+        "iPhone",
+        "iPad",
+        "Watch"
+      ],
+      "highlights": [
+        "A schedule per plant, not per app",
+        "Photo-forward plant cards",
+        "Apple Watch app and widget",
+        "English and Hindi"
+      ],
+      "privacy": {
+        "network": "none",
+        "summary": "Plants and photos live on your device and sync through your own private iCloud.",
+        "storage": "Core Data, synced to your private iCloud",
+        "location": null,
+        "health": null,
+        "analytics": "none",
+        "thirdparty": [],
+        "iap": null,
+        "cloudSync": true
+      },
+      "accent": "#2F7D57"
+    },
+    {
+      "slug": "enso",
+      "name": "Enso",
+      "folder": "ExpenseTracker",
+      "tagline": "Spend on purpose: Need, Want, Invest.",
+      "category": "Finance",
+      "year": "2026",
+      "blurb": "An expense tracker organised around intent rather than category. Every expense is a Need, a Want or an Investment, a modern read on 50/30/20, so the log tells you whether you should have bought it and not merely what it was.",
+      "detail": "Log in any currency and report in one. Receipt OCR runs on the device. There is no bank linking and no account: the only thing that ever leaves your phone is an anonymous request for exchange rates.",
+      "platforms": [
+        "iPhone",
+        "iPad",
+        "Mac",
+        "Watch"
+      ],
+      "highlights": [
+        "Budgeting by Need, Want and Investment",
+        "Multi-currency with on-device OCR",
+        "Mac menu bar extra",
+        "Face ID lock"
+      ],
+      "privacy": {
+        "network": "exchange rates",
+        "summary": "No bank linking and no accounts. The only thing sent out is an anonymous exchange-rate lookup.",
+        "storage": "SwiftData on-device, with opt-in private iCloud sync",
+        "location": null,
+        "health": null,
+        "analytics": "none",
+        "thirdparty": [
+          "An anonymous foreign-exchange rate provider"
+        ],
+        "iap": null,
+        "cloudSync": true
+      },
+      "accent": "#6D5BD0"
+    },
+    {
+      "slug": "helia",
+      "name": "Helia",
+      "folder": "VitaminD",
+      "tagline": "Sunlight, measured.",
+      "category": "Health & Fitness",
+      "year": "2026",
+      "blurb": "A vitamin D tracker that estimates what you actually synthesised, from the sun's real angle at your location, your skin type, what you were wearing and how long you stayed out.",
+      "detail": "The hero is a living sky that follows the weather and the hour. Every figure is presented as an estimate and carries a medical disclaimer, because that is exactly what it is. Your location is rounded to about a kilometre before anything is calculated.",
+      "platforms": [
+        "iPhone",
+        "iPad",
+        "Watch"
+      ],
+      "highlights": [
+        "Estimates from real solar geometry",
+        "A sky that tracks weather and time",
+        "Reads Apple Health on device",
+        "Accessibility-first type stack"
+      ],
+      "privacy": {
+        "network": "weather",
+        "summary": "Health data is read live and never synced. Your location is coarsened to roughly a kilometre.",
+        "storage": "SwiftData on-device, with opt-in private iCloud sync",
+        "location": "Coarse location, rounded to ~1 km, used for solar geometry",
+        "health": "HealthKit is read live on-device and never uploaded",
+        "analytics": "none",
+        "thirdparty": [
+          "Apple WeatherKit"
+        ],
+        "iap": null,
+        "cloudSync": true
+      },
+      "accent": "#C97F22"
+    },
+    {
+      "slug": "flux",
+      "name": "Flux",
+      "folder": "WaterTracker",
+      "tagline": "Hydration you can feel, one glass at a time.",
+      "category": "Health & Fitness",
+      "year": "2026",
+      "blurb": "Tap a glass and watch a real body of water rise toward the day's goal. An optional coffee-toned second page tracks caffeine beside it and pairs it with your sleep, so you can see what the afternoon flat white actually costs.",
+      "detail": "Not every drink hydrates equally, so each carries its own hydration factor: coffee, juice and alcohol count for less. Behind it sits a catalogue of roughly 1,880 real menu drinks across about 35 brands.",
+      "platforms": [
+        "iPhone",
+        "iPad",
+        "Watch"
+      ],
+      "highlights": [
+        "An animated wave as the whole interface",
+        "Caffeine measured against your sleep",
+        "About 1,880 real menu drinks",
+        "Interactive widgets"
+      ],
+      "privacy": {
+        "network": "none",
+        "summary": "No account, no login, ever. Its privacy manifest declares no tracking and no collected data.",
+        "storage": "A single JSON file in the app's own container. No cloud sync.",
+        "location": null,
+        "health": "Optional two-way Apple Health for water and sleep",
+        "analytics": "none",
+        "thirdparty": [],
+        "iap": null,
+        "cloudSync": false
+      },
+      "accent": "#2C7FC4"
+    },
+    {
+      "slug": "linen",
+      "name": "Linen",
+      "folder": "LinenVolumes",
+      "tagline": "A quiet archive for the looks you love.",
+      "category": "Lifestyle",
+      "year": "2026",
+      "blurb": "Save the fashion images you like, usually screenshots, and Linen trims the app chrome away, reads the caption, pulls the outfit's colours and files each look into a masonry wall and a shelf of linen-bound seasonal volumes.",
+      "detail": "Built to feel like a case-bound book rather than a utility: bone paper, warm charcoal ink, square corners, hairline rules. Your photographs are the only real colour in the app. All the vision work runs on the device and the original screenshot is discarded once it has been trimmed.",
+      "platforms": [
+        "iPhone",
+        "iPad",
+        "Apple TV"
+      ],
+      "highlights": [
+        "Trims screenshots automatically",
+        "Colour and caption read on device",
+        "Seasonal bound volumes",
+        "Share extension"
+      ],
+      "privacy": {
+        "network": "none",
+        "summary": "No network calls at all. Images never leave your device unless you export them.",
+        "storage": "Images stored on-device in the app group; opt-in iCloud",
+        "location": null,
+        "health": null,
+        "analytics": "none",
+        "thirdparty": [],
+        "iap": null,
+        "cloudSync": true
+      },
+      "accent": "#7A7264"
+    },
+    {
+      "slug": "stack",
+      "name": "Stack",
+      "folder": "BioExperiment",
+      "tagline": "Track your stack. Test what works.",
+      "category": "Health & Fitness",
+      "year": "2026",
+      "blurb": "A supplement tracker with an honest experiments layer. Tick off what you took, tap a chip for how you felt, then compare any supplement against an Apple Health metric. Magnesium days against deep sleep, for instance.",
+      "detail": "The experiments engine is honest by construction. It refuses to show a result below seven matched days, leads with effect size rather than a p-value, flags confounders, states its confidence in plain language, and never implies a correlation is a cause.",
+      "platforms": [
+        "iPhone",
+        "iPad",
+        "Mac",
+        "Watch"
+      ],
+      "highlights": [
+        "Self-experiments against about 50 Health metrics",
+        "Minimum sample sizes enforced",
+        "A 17-week consistency heatmap",
+        "Control Centre button"
+      ],
+      "privacy": {
+        "network": "none",
+        "summary": "Health data is read live and never persisted or uploaded.",
+        "storage": "On-device, with opt-in iCloud sync",
+        "location": null,
+        "health": "HealthKit is read live on-device and never persisted or uploaded",
+        "analytics": "none",
+        "thirdparty": [],
+        "iap": null,
+        "cloudSync": true
+      },
+      "accent": "#4536B8"
+    },
+    {
+      "slug": "slate",
+      "name": "Slate",
+      "folder": "MinimalTasks",
+      "tagline": "Plan with “When,” not just “Due.”",
+      "category": "Productivity",
+      "year": "2026",
+      "blurb": "A to-do app that separates the day you mean to do something from the day it is actually due. Most task apps collapse the two, and that is the distinction that decides whether your list stays honest.",
+      "detail": "Areas, projects, and a today view that organises itself. The only permissions it asks for are read-only calendar access and notifications, both optional. No location, no health data, no analytics.",
+      "platforms": [
+        "iPhone",
+        "iPad",
+        "Mac",
+        "Vision Pro",
+        "Watch"
+      ],
+      "highlights": [
+        "“When” kept separate from “Deadline”",
+        "Areas and projects",
+        "Private CloudKit sync",
+        "Two permissions, both optional"
+      ],
+      "privacy": {
+        "network": "none",
+        "summary": "Two optional permissions, no trackers, and sync that rides on your own iCloud.",
+        "storage": "SwiftData in the app group, mirrored to private CloudKit",
+        "location": null,
+        "health": null,
+        "analytics": "none",
+        "thirdparty": [],
+        "iap": null,
+        "cloudSync": true
+      },
+      "accent": "#0A84FF"
+    },
+    {
+      "slug": "folio",
+      "name": "Folio",
+      "folder": "MinimalNotes",
+      "tagline": "A quiet place to write, everywhere.",
+      "category": "Productivity",
+      "year": "2026",
+      "blurb": "Notes with real typographic care. Nine complete themes, each with its own palette, typeface and page decoration, plus rich text, images and Pencil sketches, synced through your own iCloud.",
+      "detail": "Face ID can lock a single note or the whole app. Everything is stored on device and mirrored to private CloudKit, on by default, because sync that rides on your own iCloud costs nothing and has no business being a paid tier.",
+      "platforms": [
+        "iPhone",
+        "iPad",
+        "Mac",
+        "Watch"
+      ],
+      "highlights": [
+        "Nine complete themes",
+        "Rich text, images and Pencil",
+        "Face ID on a note or the app",
+        "Private CloudKit sync"
+      ],
+      "privacy": {
+        "network": "none",
+        "summary": "No third-party servers and no trackers. Notes sync through your own iCloud.",
+        "storage": "SwiftData on-device with private CloudKit sync",
+        "location": null,
+        "health": null,
+        "analytics": "none",
+        "thirdparty": [],
+        "iap": null,
+        "cloudSync": true
+      },
+      "accent": "#B3861B"
+    },
+    {
+      "slug": "flaps",
+      "name": "Flaps",
+      "folder": "DailyFlaps",
+      "tagline": "Your day, in flaps.",
+      "category": "Health & Fitness",
+      "year": "2026",
+      "blurb": "Apple Health rendered as a split-flap departure board. Steps, sleep, resting heart rate and exercise clatter into place the way an airport board announces the next departure.",
+      "detail": "A custom flip engine drives the entire identity, with twenty themes each carrying its own accent. The app is strictly read-only and entirely on device: it takes a snapshot of Health and shows it back to you.",
+      "platforms": [
+        "iPhone",
+        "iPad",
+        "Watch"
+      ],
+      "highlights": [
+        "A custom split-flap engine",
+        "Twenty themes",
+        "Read-only and fully on device",
+        "Shareable cards"
+      ],
+      "privacy": {
+        "network": "none",
+        "summary": "Read-only and entirely on your device. No accounts, no cloud, no analytics.",
+        "storage": "An app-group JSON snapshot on your device",
+        "location": null,
+        "health": "HealthKit, read-only, on-device",
+        "analytics": "none",
+        "thirdparty": [],
+        "iap": null,
+        "cloudSync": false
+      },
+      "accent": "#8A6A2F"
+    },
+    {
+      "slug": "haru",
+      "name": "Haru",
+      "folder": "Haru",
+      "tagline": "하루. One day, pressed play.",
+      "category": "Productivity",
+      "year": "2026",
+      "blurb": "A routine sequencer. An ordered list of short timed steps that you press play on and then simply follow. Haptics lead, so you can run a morning routine without looking at the screen.",
+      "detail": "Local first, no account, no feed, and none of the anxiety mechanics habit apps reach for. Nothing is fetched at build time either: the whole thing is a local package with no dependencies.",
+      "platforms": [
+        "iPhone",
+        "Watch"
+      ],
+      "highlights": [
+        "Timed routine sequences",
+        "Haptics first, screen optional",
+        "Apple Watch app and widgets",
+        "No dependencies at all"
+      ],
+      "privacy": {
+        "network": "none",
+        "summary": "No account, no network, no feed.",
+        "storage": "On-device",
+        "location": null,
+        "health": null,
+        "analytics": "none",
+        "thirdparty": [],
+        "iap": null,
+        "cloudSync": false
+      },
+      "accent": "#BB812F"
+    },
+    {
+      "slug": "meridian",
+      "name": "Meridian",
+      "folder": "Meridian",
+      "tagline": "A precision world clock, on a globe that is actually alive.",
+      "category": "Travel",
+      "year": "2026",
+      "blurb": "A worldtimer built around a live dot globe with a real day and night terminator, projected and rotating rather than drawn once, with weather as ambient context instead of the main event.",
+      "detail": "Time zones, city search and the solar maths are all computed on the device. Only the weather touches the network, and without it the app degrades to a fully working world clock. Aeroplane mode is a supported configuration, not a failure state.",
+      "platforms": [
+        "iPhone",
+        "iPad",
+        "Mac",
+        "Vision Pro",
+        "Apple TV",
+        "Watch"
+      ],
+      "highlights": [
+        "A live projected dot globe",
+        "Time zones and solar maths offline",
+        "Six Apple platforms",
+        "Widgets on every one of them"
+      ],
+      "privacy": {
+        "network": "weather",
+        "summary": "Everything except the weather is computed on your device.",
+        "storage": "On-device",
+        "location": "Optional, used to place your home city",
+        "health": null,
+        "analytics": "none",
+        "thirdparty": [
+          "Apple WeatherKit"
+        ],
+        "iap": null,
+        "cloudSync": false
+      },
+      "accent": "#C2571A"
+    },
+    {
+      "slug": "threshold",
+      "name": "Threshold",
+      "folder": "Zones",
+      "tagline": "Zones anchored to your threshold, not to 220 minus your age.",
+      "category": "Health & Fitness",
+      "year": "2026",
+      "blurb": "Heart-rate zone training for Apple Watch and iPhone, built on lactate threshold rather than the borrowed percentage-of-maximum model most zone apps still use.",
+      "detail": "The incumbent in this category puts custom zone boundaries behind a paywall and derives them from a formula that was never meant to be precise. Threshold inverts both. Accessibility, dark mode and localisation were in scope from the first commit.",
+      "platforms": [
+        "iPhone",
+        "Watch"
+      ],
+      "highlights": [
+        "A lactate-threshold zone model",
+        "Live zone feedback mid-workout",
+        "Journeys and splits",
+        "Accessible from day one"
+      ],
+      "privacy": {
+        "network": "none",
+        "summary": "Workouts are read from Apple Health on-device and stay there.",
+        "storage": "On-device",
+        "location": "Used during workouts for route and pace",
+        "health": "HealthKit, on-device",
+        "analytics": "none",
+        "thirdparty": [],
+        "iap": null,
+        "cloudSync": false
+      },
+      "accent": "#C2453A"
+    },
+    {
+      "slug": "apex",
+      "name": "Apex",
+      "folder": "FormulaOne",
+      "tagline": "The race weekend, told properly.",
+      "category": "Sports",
+      "year": "2026",
+      "blurb": "A Formula 1 companion: live timing with sector splits, championship standings, circuit maps that mark the overtaking zones, tyre stints, and driver and constructor profiles carrying a whole career rather than eleven rounds of one.",
+      "detail": "Hand-drawn track maps, a reaction-lights game, season history, widgets and an Apple Watch app. An independent project, not affiliated with or endorsed by Formula 1.",
+      "platforms": [
+        "iPhone",
+        "iPad",
+        "Mac",
+        "Watch"
+      ],
+      "highlights": [
+        "Live timing with sector splits",
+        "Circuit maps and overtaking zones",
+        "Tyre stints and strategy",
+        "Career-length driver profiles"
+      ],
+      "privacy": {
+        "network": "race data",
+        "summary": "Fetches published race data. No account, no analytics.",
+        "storage": "On-device cache",
+        "location": null,
+        "health": null,
+        "analytics": "none",
+        "thirdparty": [
+          "A public Formula 1 results and timing data source"
+        ],
+        "iap": null,
+        "cloudSync": false
+      },
+      "accent": "#B3261E"
+    },
+    {
+      "slug": "cabin",
+      "name": "Cabin",
+      "folder": "Tesla",
+      "tagline": "A calmer set of car controls.",
+      "category": "Personal project",
+      "year": "2026",
+      "blurb": "Climate, charging, locks and location for an electric car, plus a tyre-pressure watch and a history view. Built because the official app buries the four things you use daily behind everything else.",
+      "detail": "A personal project rather than a store submission. Not affiliated with, endorsed by, or connected to Tesla, Inc.",
+      "platforms": [
+        "iPhone",
+        "Watch"
+      ],
+      "highlights": [
+        "Climate and charging at a glance",
+        "Tyre-pressure watch",
+        "Widgets for the four daily controls",
+        "Command history"
+      ],
+      "privacy": {
+        "network": "vehicle API",
+        "summary": "Talks to the vehicle's own API using your credentials. Nothing is sent anywhere else.",
+        "storage": "On-device, credentials in the Keychain",
+        "location": "Vehicle location, shown on-device",
+        "health": null,
+        "analytics": "none",
+        "thirdparty": [
+          "The vehicle manufacturer's own API"
+        ],
+        "iap": null,
+        "cloudSync": false
+      },
+      "accent": "#5A5F66"
+    },
+    {
+      "slug": "flappomodoro",
+      "name": "Flap Pomodoro",
+      "folder": "FlapPomodoro",
+      "tagline": "A focus timer that clatters.",
+      "category": "Productivity",
+      "year": "2026",
+      "blurb": "The Pomodoro technique rendered as a split-flap board, with the minutes physically falling away, plus a Mac menu bar timer, tasks and statistics.",
+      "detail": "A design study that turned into a real app: the same timer idea as Pomodoro given a completely different physical metaphor, then taken across iPhone, Mac, Apple TV, Vision Pro and Watch.",
+      "platforms": [
+        "iPhone",
+        "Mac",
+        "Apple TV",
+        "Vision Pro",
+        "Watch"
+      ],
+      "highlights": [
+        "A split-flap countdown",
+        "Mac menu bar timer",
+        "Five platforms",
+        "Tasks and statistics"
+      ],
+      "privacy": {
+        "network": "none",
+        "summary": "Entirely on-device.",
+        "storage": "On-device",
+        "location": null,
+        "health": null,
+        "analytics": "none",
+        "thirdparty": [],
+        "iap": null,
+        "cloudSync": false
+      },
+      "accent": "#4A443E"
+    }
+  ]
+}

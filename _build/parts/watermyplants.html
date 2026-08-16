@@ -1,0 +1,395 @@
+<style>
+/* =====================================================================
+   WaterMyPlant — plant detail.
+   Photographic hero (potted palm on a lit wall) with the Liquid-Glass
+   detail sheet riding up over the bottom of the image.
+   Tokens pulled from the app: baseColor #3C8AEB / #5EADFF (AppColors.swift),
+   sheet preferredCornerRadius 38, content inset 24, name 28/bold,
+   age 13/semibold kern 1.0, caption 12/semibold, status 34/bold,
+   CTA capsule, monospaced 14/semibold kern 0.6, uppercase.
+   Every proportion below is expressed against the 393pt iPhone width,
+   so 1cqw == 3.93pt of the real screen.
+   ===================================================================== */
+
+.c-watermyplants {
+  --_p: var(--p, 1);                 /* never shadows the ancestor's --p */
+  --wmp-blue: #5EADFF;               /* UIColor.baseColor, dark  */
+  --wmp-blue-deep: #3C8AEB;          /* UIColor.baseColor, light */
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+.c-watermyplants *, .c-watermyplants *::before, .c-watermyplants *::after {
+  box-sizing: border-box;
+}
+
+/* .wmp-phone is only the sizing box + the query container. Nothing on it may
+   use cqw — an element can never query itself — so the chrome lives on
+   .wmp-screen, which is a descendant and resolves cqw against the phone. */
+/* Width-driven, not height-driven: if the phone is sized by `height` +
+   `aspect-ratio`, `max-width` clamps the width without giving the height
+   back, so a narrow column silently stretches the screen. Deriving the
+   width first (capped at 100%) keeps 41/74 exact at every size and can
+   never push past the container. */
+.c-watermyplants .wmp-phone {
+  position: relative;
+  width: min(100%, 21rem);                                /* fallback: no svh */
+  width: min(100%, calc(min(62svh, 38rem) * 41 / 74));
+  max-width: 100%;
+  aspect-ratio: 41 / 74;
+  container-type: inline-size;
+}
+.c-watermyplants .wmp-screen {
+  position: absolute;
+  inset: 0;
+  border-radius: 12.2cqw;      /* the iPhone display corner */
+  overflow: hidden;
+  background: #EDE6DA;
+  box-shadow:
+    0 0 0 1px var(--hairline, rgba(255,255,255,.11)),
+    0 2.5rem 5rem -1.5rem rgba(0, 0, 0, .75);
+  isolation: isolate;
+}
+
+/* ---------- the photograph ---------- */
+
+.c-watermyplants .wmp-photo {
+  position: absolute;
+  inset: 0;
+  transform: scale(calc(1.07 - clamp(0, calc(var(--_p) * 1.6), 1) * 0.07));
+  transform-origin: 50% 38%;
+}
+.c-watermyplants .wmp-photo svg { display: block; width: 100%; height: 100%; }
+
+/* Vignette + the top scrim from PlantDetailScreen (black .45 -> clear, 150pt). */
+.c-watermyplants .wmp-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,.33) 0%, rgba(0,0,0,0) 32cqw),
+    radial-gradient(126% 92% at 50% 36%, rgba(0,0,0,0) 48%, rgba(28,20,8,.26) 100%);
+}
+
+/* ---------- back button (44pt capsule, ultra-thin dark material) ---------- */
+
+.c-watermyplants .wmp-back {
+  position: absolute;
+  top: 11cqw;
+  left: 4.6cqw;
+  width: 11.2cqw;
+  height: 11.2cqw;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: rgba(18, 22, 20, .3);
+  backdrop-filter: blur(10px) saturate(1.2);
+  -webkit-backdrop-filter: blur(10px) saturate(1.2);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.2);
+  --b: clamp(0, calc((var(--_p) - 0.02) * 6), 1);
+  opacity: var(--b);
+  transform: translateX(calc((var(--b) - 1) * 1.4cqw)) scale(calc(0.86 + var(--b) * 0.14));
+}
+.c-watermyplants .wmp-chev {
+  width: 2.6cqw;
+  height: 2.6cqw;
+  border-left: max(1.4px, .58cqw) solid var(--ink, #fff);
+  border-bottom: max(1.4px, .58cqw) solid var(--ink, #fff);
+  transform: rotate(45deg) translate(.35cqw, -.35cqw);
+  border-radius: 0 0 0 1px;
+}
+
+/* ---------- the glass sheet ---------- */
+
+.c-watermyplants .wmp-sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 5.4cqw 6.1cqw 4.4cqw;
+  /* preferredCornerRadius = 38pt on a 393pt screen */
+  border-radius: 9.7cqw 9.7cqw 0 0;
+  background:
+    linear-gradient(to bottom, rgba(16, 26, 21, .52) 0%, rgba(9, 15, 12, .74) 42%, rgba(5, 9, 8, .86) 100%);
+  backdrop-filter: blur(22px) saturate(1.45);
+  -webkit-backdrop-filter: blur(22px) saturate(1.45);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.17),
+    inset 0 0 0 1px rgba(255,255,255,.05),
+    0 -1.5rem 3.5rem rgba(0,0,0,.42);
+  --sh1: clamp(0, calc((var(--_p) - 0.03) * 2.6), 1);
+  --sh2: clamp(0, calc((var(--_p) - 0.13) * 2.1), 1);
+  transform: translateY(calc((1 - var(--sh1)) * 104% - (var(--sh1) - var(--sh2)) * 2.4%));
+}
+
+/* iOS grabber: 36 x 5pt, .34 white */
+.c-watermyplants .wmp-grab {
+  position: absolute;
+  top: 1.4cqw;
+  left: 50%;
+  width: 9.2cqw;
+  height: 1.3cqw;
+  margin-left: -4.6cqw;
+  border-radius: 999px;
+  background: var(--ink-3, rgba(255,255,255,.34));
+}
+
+/* the ellipsis button, top-right of the sheet */
+.c-watermyplants .wmp-more {
+  position: absolute;
+  top: 5cqw;
+  right: 6.1cqw;
+  width: 9.4cqw;
+  height: 9.4cqw;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  gap: 0;
+  background: rgba(255,255,255,.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
+  --m: clamp(0, calc((var(--_p) - 0.26) * 5), 1);
+  opacity: var(--m);
+  transform: scale(calc(0.8 + var(--m) * 0.2));
+}
+/* Three dots. The radius is stated explicitly — an implicit
+   farthest-corner circle resolves differently for the centre dot than
+   for the two edge dots, which made the middle one visibly smaller. */
+.c-watermyplants .wmp-more span {
+  display: block;
+  width: 4.4cqw;
+  height: .95cqw;
+  --dot: var(--ink-2, rgba(255,255,255,.58));
+  background:
+    radial-gradient(circle .44cqw at .475cqw 50%, var(--dot) 96%, transparent 100%),
+    radial-gradient(circle .44cqw at 50% 50%, var(--dot) 96%, transparent 100%),
+    radial-gradient(circle .44cqw at calc(100% - .475cqw) 50%, var(--dot) 96%, transparent 100%);
+}
+
+/* Sheet content: each block rides up on its own lagged ramp. */
+.c-watermyplants .wmp-rise {
+  --c: clamp(0, calc((var(--_p) - 0.24 - var(--n, 0) * 0.05) * 5), 1);
+  opacity: var(--c);
+  transform: translateY(calc((1 - var(--c)) * 1.6cqw));
+}
+
+.c-watermyplants .wmp-name,
+.c-watermyplants .wmp-when {
+  margin: 0;
+  font-family: var(--sans, "Figtree", system-ui, sans-serif);
+  font-weight: 800;
+  color: var(--ink, #fff);
+  line-height: 1.08;
+  letter-spacing: -0.018em;
+}
+.c-watermyplants .wmp-name { font-size: clamp(.95rem, 7.1cqw, 1.62rem); }
+.c-watermyplants .wmp-when {
+  font-size: clamp(1.02rem, 8.3cqw, 1.86rem);
+  margin-top: 1.1cqw;
+}
+
+.c-watermyplants .wmp-caps {
+  margin: 0;
+  font-family: var(--sans, "Figtree", system-ui, sans-serif);
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--ink-2, rgba(255,255,255,.58));
+  line-height: 1.25;
+}
+.c-watermyplants .wmp-age {
+  font-size: clamp(.5rem, 3.25cqw, .78rem);
+  letter-spacing: .085em;   /* kern 1.0 @ 13pt */
+  margin-top: 1.8cqw;
+}
+.c-watermyplants .wmp-cap {
+  font-size: clamp(.48rem, 3.05cqw, .72rem);
+  letter-spacing: .105em;
+}
+.c-watermyplants .wmp-status { margin-top: 7.6cqw; }
+
+/* CTA — capsule, monospaced semibold caps, water blue */
+.c-watermyplants .wmp-cta {
+  position: relative;
+  margin-top: 6.4cqw;
+  height: 12.4cqw;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  font-family: var(--mono, "IBM Plex Mono", ui-monospace, monospace);
+  font-weight: 600;
+  font-size: clamp(.46rem, 3.25cqw, .78rem);
+  letter-spacing: .11em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(180deg, var(--wmp-blue) 0%, var(--wmp-blue-deep) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.34),
+    inset 0 0 0 1px rgba(255,255,255,.1),
+    0 .5rem 1.4rem -.3rem rgba(60,138,235,.5);
+}
+.c-watermyplants .wmp-cta span { position: relative; z-index: 1; }
+/* ambient: a slow sheen crossing the button. Translated, not
+   background-position'd, so it stays on the compositor. */
+.c-watermyplants .wmp-cta::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -45%;
+  width: 45%;
+  background: linear-gradient(105deg,
+    transparent 0%, rgba(255,255,255,.34) 50%, transparent 100%);
+  animation: wmp-sheen 7s cubic-bezier(.4,0,.2,1) infinite;
+}
+@keyframes wmp-sheen {
+  0%        { transform: translateX(0); }
+  45%, 100% { transform: translateX(345%); }
+}
+
+.c-watermyplants .wmp-home {
+  width: 34cqw;
+  height: 1.15cqw;
+  margin: 3.6cqw auto 0;
+  border-radius: 999px;
+  background: rgba(255,255,255,.4);
+}
+
+/* ---------- the plant ---------- */
+
+.c-watermyplants .wmp-sway {
+  transform-box: view-box;
+  transform-origin: 0 0;
+}
+.c-watermyplants .wmp-sway--a { animation: wmp-swayA 11s ease-in-out infinite; }
+.c-watermyplants .wmp-sway--b { animation: wmp-swayB 8.5s ease-in-out infinite; }
+@keyframes wmp-swayA {
+  0%, 100% { transform: rotate(-0.7deg); }
+  50%      { transform: rotate(0.85deg); }
+}
+@keyframes wmp-swayB {
+  0%, 100% { transform: rotate(0.65deg); }
+  50%      { transform: rotate(-0.95deg); }
+}
+
+/* The crown thickens as the first fronds appear. */
+.c-watermyplants .wmp-crown {
+  transform-box: view-box;
+  transform-origin: 0 0;
+  --k: clamp(0, calc(var(--_p) * 4), 1);
+  opacity: calc(var(--k) * .92);
+  transform: scale(calc(0.35 + 0.65 * var(--k)));
+}
+
+/* Each frond unfurls from a folded, shortened state, overshoots ~6deg and
+   settles — the overshoot is the gap between a fast ramp and a lagged one. */
+.c-watermyplants .wmp-frond {
+  transform-box: view-box;
+  transform-origin: 0 0;
+  --f1: clamp(0, calc((var(--_p) - 0.01 - var(--n, 0) * 0.045) * 5.5), 1);
+  --f2: clamp(0, calc((var(--_p) - 0.11 - var(--n, 0) * 0.045) * 4.4), 1);
+  transform:
+    scaleX(var(--mir, 1))
+    rotate(calc((var(--rot) * var(--f1) + (var(--f1) - var(--f2)) * 6.5) * 1deg))
+    scale(calc(var(--s, 1) * (0.62 + 0.38 * var(--f1))));
+  opacity: clamp(0, calc(var(--f1) * 2.4), 1);
+}
+
+.c-watermyplants .wmp-l-back {
+  fill: #1B5940;
+  fill: color-mix(in srgb, var(--accent, #2F7D57) 74%, #03170D);
+  color: #0E3A28;
+}
+.c-watermyplants .wmp-l-mid {
+  fill: #2F7D57;
+  fill: var(--accent, #2F7D57);
+  color: #15442F;
+}
+.c-watermyplants .wmp-l-front {
+  fill: #57A279;
+  fill: color-mix(in srgb, var(--accent, #2F7D57) 74%, #D7F0D8);
+  color: #1E5A3F;
+}
+
+/* ---------- the droplet ---------- */
+
+.c-watermyplants .wmp-drop {
+  transform-box: view-box;
+  transform-origin: 0 0;
+  --d: clamp(0, calc((var(--_p) - 0.56) * 4), 1);
+  --dd: calc(var(--d) * var(--d));
+  transform:
+    translateY(calc(var(--dd) * 86px))
+    scale(calc(1 - var(--dd) * 0.1), calc(1 + var(--dd) * 0.45));
+  /* appears fast, vanishes on impact — two ramps multiplied, so no
+     nested min() is needed inside the opacity calc */
+  opacity: calc(clamp(0, calc(var(--d) * 9), 1)
+           * clamp(0, calc((1 - var(--d)) * 14), 1));
+}
+.c-watermyplants .wmp-ripple {
+  transform-box: view-box;
+  transform-origin: 0 0;
+  --r: clamp(0, calc((var(--_p) - 0.79 - var(--n, 0) * 0.04) * 7), 1);
+  transform: scale(calc(0.15 + var(--r) * 1.5));
+  opacity: calc((1 - var(--r)) * var(--r) * 3.4);
+}
+
+/* ---------- reduced motion: pin to the finished frame ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .c-watermyplants { --_p: 1; }
+  .c-watermyplants .wmp-sway--a,
+  .c-watermyplants .wmp-sway--b,
+  .c-watermyplants .wmp-cta::after { animation: none; }
+  .c-watermyplants .wmp-cta::after { opacity: 0; }
+  .c-watermyplants .wmp-drop { opacity: 0; }
+  .c-watermyplants .wmp-ripple { opacity: 0; }
+}
+
+/* the real photograph, cropped from the app's own capture */
+.c-watermyplants .wmp-photo img{
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: 50% 42%;
+  display: block;
+}
+</style>
+
+<div class="c-watermyplants">
+  <div class="wmp-phone"><div class="wmp-screen">
+
+    <div class="wmp-photo" aria-hidden="true">
+      <img src="assets/art/watermyplants-hero.webp" alt=""
+           width="760" height="688" loading="lazy" decoding="async">
+    </div>
+
+    <div class="wmp-vignette" aria-hidden="true"></div>
+
+    <div class="wmp-back" aria-hidden="true"><i class="wmp-chev"></i></div>
+
+    <div class="wmp-sheet">
+      <div class="wmp-grab" aria-hidden="true"></div>
+      <div class="wmp-more" aria-hidden="true"><span></span></div>
+
+      <div class="wmp-rise" style="--n:0">
+        <p class="wmp-name">Jumbo Palm</p>
+        <p class="wmp-caps wmp-age">7 weeks old</p>
+      </div>
+
+      <div class="wmp-rise wmp-status" style="--n:1">
+        <p class="wmp-caps wmp-cap">Watering scheduled for</p>
+        <p class="wmp-when">Today</p>
+      </div>
+
+      <div class="wmp-rise" style="--n:2">
+        <div class="wmp-cta"><span>Mark as watered</span></div>
+      </div>
+
+      <div class="wmp-home" aria-hidden="true"></div>
+    </div>
+
+  </div></div>
+</div>
