@@ -14,7 +14,7 @@ import components
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SITE = os.path.dirname(HERE)
-DOMAIN = "https://pawan.bio"
+DOMAIN = "https://pawan.info"
 UPDATED = date.today().strftime("%d %B %Y")
 
 data = json.load(open(f"{HERE}/data.json"))

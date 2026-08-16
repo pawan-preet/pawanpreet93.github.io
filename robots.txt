@@ -1,4 +1,4 @@
 User-agent: *
 Disallow: /legal/
 
-Sitemap: https://pawan.bio/sitemap.xml
+Sitemap: https://pawan.info/sitemap.xml
