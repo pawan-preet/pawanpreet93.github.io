@@ -175,16 +175,28 @@
         "Face ID lock"
       ],
       "privacy": {
-        "network": "exchange rates",
-        "summary": "No bank linking and no accounts. The only thing sent out is an anonymous exchange-rate lookup.",
+        "network": "exchange rates, iCloud sync, purchase check",
+        "summary": "No bank linking and no accounts. Your spending is computed on your device and syncs only through your own private iCloud; what leaves it is an anonymous exchange-rate lookup and, if you buy Pro, the purchase check that validates it.",
         "storage": "SwiftData on-device, with opt-in private iCloud sync",
-        "location": null,
+        "location": "Optional. When you turn on location suggestions, your location is read on the device to pre-pick a category for where you are standing. It is never uploaded and never leaves the device",
         "health": null,
         "analytics": "none",
         "thirdparty": [
-          "An anonymous foreign-exchange rate provider"
+          "Frankfurter and Open Exchange Rates — receive the currency codes to convert, nothing else; no account, no key, no identifier, and no spending data",
+          "RevenueCat — validates App Store purchases; receives the store receipt and a random anonymous app id, never your name, email, or any transaction, budget or category",
+          "Tally — only if you choose to open a feedback form, the link carries the app version, build, OS version and device model so reports are actionable; nothing is sent unless you submit the form"
         ],
-        "iap": null,
+        "iap": {
+          "name": "Enso Pro",
+          "plans": [
+            "Monthly",
+            "Annual",
+            "Lifetime"
+          ],
+          "trial": "7 days free on monthly and 14 days free on annual; the lifetime unlock is a single one-time purchase with no trial",
+          "free": "Logging by Need, Want and Investment, the monthly budget and its on-pace verdict, reports, subscriptions, widgets, complications and Shortcuts.",
+          "unlocks": "Money Story, live multi-currency rates, category envelopes, the subscription screenshot scanner, recurring rules, location suggestions and the extra app icons."
+        },
         "cloudSync": true
       },
       "accent": "#6D5BD0"
