@@ -482,17 +482,28 @@
         "Widgets on every one of them"
       ],
       "privacy": {
-        "network": "weather",
-        "summary": "Everything except the weather is computed on your device.",
-        "storage": "On-device",
-        "location": "Optional, used to place your home city",
+        "network": "weather, iCloud sync, purchase check",
+        "summary": "Every time and every sunrise is computed on your device; your cities and people live in your own private iCloud, and none of it is ever sent to me.",
+        "storage": "On-device (SwiftData), synced through your private iCloud database — readable by no one else, including me",
+        "location": null,
         "health": null,
         "analytics": "none",
         "thirdparty": [
-          "Apple WeatherKit"
+          "Apple Weather (WeatherKit) — receives the coordinates of your saved cities, taken from the app's bundled atlas rather than your device's location, to fetch current conditions",
+          "Open-Meteo — receives the same city coordinates as a fallback when Apple Weather has no answer; no account, no key, no identifier",
+          "RevenueCat — validates App Store purchases; receives the store receipt and a random anonymous app id, never your name, email or contents",
+          "Tally — only if you choose to open a feedback form, the link carries the app version, OS version, device model and locale so reports are actionable; nothing is sent unless you submit the form"
         ],
-        "iap": null,
-        "cloudSync": false
+        "iap": {
+          "name": "Meridian Pro",
+          "plans": [
+            "Lifetime"
+          ],
+          "trial": "No trial and no subscription; a single one-time purchase",
+          "free": "The whole instrument — the globe, the sight, the sun bar, golden hour, clock-change warnings — plus three saved cities and three people.",
+          "unlocks": "Unlimited cities and people, custom places included, and the widgets' sun-arc Detail faces."
+        },
+        "cloudSync": true
       },
       "accent": "#C2571A"
     },
