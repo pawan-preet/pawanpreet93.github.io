@@ -382,13 +382,16 @@
         "Two permissions, both optional"
       ],
       "privacy": {
-        "network": "none",
-        "summary": "Two optional permissions, no trackers, and sync that rides on your own iCloud.",
+        "network": "iCloud sync",
+        "summary": "No accounts and no trackers. Your to-dos live on your device and sync only through your own private iCloud; nothing else is uploaded, and the calendar and photo features are read on-device only.",
         "storage": "SwiftData in the app group, mirrored to private CloudKit",
         "location": null,
         "health": null,
         "analytics": "none",
-        "thirdparty": [],
+        "thirdparty": [
+          "Apple iCloud (CloudKit) — when sync is on, your to-dos are mirrored to your own private iCloud database, which only you can read; Apple stores it under your Apple Account and it can be turned off in Settings",
+          "Tally — only if you choose to open a feedback form in Settings, the link carries the app version, build, OS version and device model so reports are actionable; nothing is sent unless you submit the form"
+        ],
         "iap": null,
         "cloudSync": true
       },
