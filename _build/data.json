@@ -348,10 +348,10 @@
       ],
       "privacy": {
         "network": "none",
-        "summary": "Health data is read live and never persisted or uploaded.",
+        "summary": "Health data is read on your device, any figures kept are stored on your device, and none of it is uploaded.",
         "storage": "On-device, with opt-in iCloud sync",
         "location": null,
-        "health": "HealthKit is read live on-device and never persisted or uploaded",
+        "health": "HealthKit is read on-device. Daily figures for the habits Health keeps for you are stored on your device so past days can be shown and compared, and a subjective mood rating can optionally be written back to Health. Nothing is uploaded.",
         "analytics": "none",
         "thirdparty": [],
         "iap": null,
